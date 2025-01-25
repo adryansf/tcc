@@ -1,0 +1,24 @@
+version: "3.9"
+name: tcc
+services:
+  database:
+    image: postgres:15
+    container_name: tcc_database
+    restart: always
+    environment:
+      POSTGRES_USER: tcc_user
+      POSTGRES_PASSWORD: tcc_password
+      POSTGRES_DB: tcc_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - tcc_network
+
+volumes:
+  db_data:
+
+networks:
+  tcc_network:
+    driver: bridge
