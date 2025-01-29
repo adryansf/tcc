@@ -1,8 +1,14 @@
 // Repositories
 import { ClientsRepository, ICreateClientData } from "./clients.repository";
 
+// Dtos
+import { CreateClientDto } from "./dtos/inputs/create-client.dto";
+
 // Entities
 import { ClientEntity } from "./entities/client.entity";
+
+// Helpers
+import { encryptPassword } from "@/common/helpers/bcrypt.helper";
 
 // Errors
 import { Either, left, right } from "@/app/common/errors/either";
@@ -34,7 +40,7 @@ export class ClientsService implements IClientsService {
   }
 
   async create(
-    data: ICreateClientData
+    data: CreateClientDto
   ): Promise<Either<BaseError, Partial<ClientEntity>>> {
     const existsEmail = await this._repository.findByEmail(data.email);
 
@@ -52,7 +58,9 @@ export class ClientsService implements IClientsService {
       );
     }
 
-    const client = await this._repository.create(data);
+    const senha = await encryptPassword(data.senha);
+
+    const client = await this._repository.create({ ...data, senha });
 
     return right(client);
   }
