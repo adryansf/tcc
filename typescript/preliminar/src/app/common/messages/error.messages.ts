@@ -6,6 +6,9 @@ export const errorMessages = {
       CPFNotUnique: `O CPF já está em utilização.`,
     },
   },
+  auth: {
+    BadRequest: "O e-mail e/ou senha estão errados.",
+  },
   Unauthorized:
     "Você não possui permissão suficiente para acessar esse recurso.",
   BadRequest:
