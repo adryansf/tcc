@@ -3,6 +3,7 @@ import {
   Request as RequestExpress,
   Response as ResponseExpress,
 } from "express";
+import { JwtPayload } from "@/app/modules/auth/interfaces/jwt-payload.interface";
 
 export interface HttpResponseSuccess<Data> {
   statusCode: number;
@@ -19,6 +20,8 @@ export type HttpResponse<Data> = HttpResponseSuccess<Data> | HttpResponseError;
 
 export interface NextFunction extends NextFunctionExpress {}
 
-export interface Request extends RequestExpress {}
+export interface Request extends RequestExpress {
+  auth?: JwtPayload;
+}
 
 export interface Response extends ResponseExpress {}

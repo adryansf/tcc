@@ -10,13 +10,13 @@ import { generateJWT } from "@/app/common/helpers/jwt.helper";
 import { Either, left, right } from "@/app/common/errors/either";
 import { BaseError } from "@/app/common/errors/base.error";
 import { BadRequestError } from "@/app/common/errors/bad-request.error";
-import { NotFoundError } from "@/app/common/errors/not-found.error";
 
 // Messages
 import { MESSAGES } from "@/app/common/messages";
 
 // Types
 import { Repositories } from "./auth.module";
+import { RoleEnum } from "../roles/enums";
 
 interface IAuthService {
   loginClients: (
@@ -39,8 +39,14 @@ export class AuthService implements IAuthService {
       return left(new BadRequestError(MESSAGES.error.auth.BadRequest));
     }
 
+    delete client["senha"];
+
     // Gerar token e retornar
-    const { token, expiresIn } = generateJWT(client);
+    const { token, expiresIn } = generateJWT({
+      email: client.email,
+      id: client.id,
+      role: RoleEnum.CLIENT,
+    });
 
     return right({
       token,

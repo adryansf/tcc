@@ -13,4 +13,11 @@ export const errorMessages = {
     "Você não possui permissão suficiente para acessar esse recurso.",
   BadRequest:
     "A requisição contém dados inválidos. Verifique os campos e tente novamente.",
+  middleware: {
+    auth: {
+      BadRequest: {
+        Unformatted: `Token mal formatado.`,
+      },
+    },
+  },
 };

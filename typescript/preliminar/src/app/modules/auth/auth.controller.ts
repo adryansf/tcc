@@ -47,7 +47,7 @@ export class AuthController extends BaseController implements IAuthController {
       return this.sendErrorResponse(res, result.value);
     }
 
-    const output = new LoginAuthClientsOutputDto(result.value).toJSON();
+    const output = new LoginAuthClientsOutputDto(result.value);
 
     return this.sendSuccessResponse(res, output);
   }
