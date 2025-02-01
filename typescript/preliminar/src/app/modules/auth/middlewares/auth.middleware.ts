@@ -45,9 +45,14 @@ export const authMiddleware = async (
     return res.status(error.statusCode).json(error.toJSON());
   }
 
-  const result = verify(token, SECRET) as JwtPayload;
+  try {
+    const result = verify(token, SECRET) as JwtPayload;
 
-  req.auth = result;
+    req.auth = result;
 
-  next();
+    next();
+  } catch (err) {
+    const error = new UnauthorizedError();
+    return res.status(error.statusCode).json(error.toJSON());
+  }
 };

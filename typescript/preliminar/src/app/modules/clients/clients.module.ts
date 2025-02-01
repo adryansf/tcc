@@ -3,6 +3,9 @@ import { ClientsService } from "./clients.service";
 import { ClientsController } from "./clients.controller";
 import { ClientsRepository } from "./clients.repository";
 
+// Middlewares
+import { authMiddleware } from "../auth/middlewares/auth.middleware";
+
 export class ClientsModule extends BaseModule<
   ClientsController,
   ClientsService,
@@ -17,7 +20,11 @@ export class ClientsModule extends BaseModule<
   }
 
   routes() {
-    this._router.get(":id", this._controller.findOne.bind(this._controller));
+    this._router.get(
+      ":id",
+      authMiddleware,
+      this._controller.findOne.bind(this._controller)
+    );
     this._router.post("", this._controller.create.bind(this._controller));
   }
 }
