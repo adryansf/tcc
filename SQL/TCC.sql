@@ -42,14 +42,14 @@ CREATE TABLE "Agencia" (
   "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   "nome" varchar NOT NULL,
   "telefone" varchar,
-  "numero" varchar UNIQUE NOT NULL,
+  "numero" SERIAL UNIQUE NOT NULL,
   "dataDeCriacao" timestamp DEFAULT CURRENT_TIMESTAMP,
   "dataDeAtualizacao" timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE "Conta" (
   "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  "numero" varchar UNIQUE NOT NULL,
+  "numero" SERIAL UNIQUE NOT NULL,
   "saldo" decimal(15, 2) NOT NULL DEFAULT 0.00,
   "tipo" varchar NOT NULL, -- Tipo será tratado no back-end
   "idAgencia" UUID NOT NULL,
