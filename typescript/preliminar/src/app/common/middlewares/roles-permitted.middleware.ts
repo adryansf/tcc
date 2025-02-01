@@ -7,7 +7,7 @@ import {
   Response,
   NextFunction,
 } from "@/app/common/interfaces/http.interfaces";
-import { RoleEnum } from "../enums";
+import { RoleEnum } from "../enums/role.enum";
 
 export const rolesPermittedMiddleware = (...rolesPermitted: RoleEnum[]) => {
   return (req: Request, res: Response, next: NextFunction) => {

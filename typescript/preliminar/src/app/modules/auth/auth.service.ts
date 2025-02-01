@@ -16,7 +16,7 @@ import { MESSAGES } from "@/app/common/messages";
 
 // Types
 import { Repositories } from "./auth.module";
-import { RoleEnum } from "../roles/enums";
+import { RoleEnum } from "@/common/enums/role.enum";
 
 interface IAuthService {
   loginClients: (

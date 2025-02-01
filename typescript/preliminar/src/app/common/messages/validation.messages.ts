@@ -9,6 +9,8 @@ export const validationMessages = {
   InvalidCPF: (fieldName: string) =>
     `O campo ${fieldName} deve ser um CPF válido.`,
   IsUUID: (fieldName: string) => `O campo ${fieldName} deve ser um UUID.`,
-  IsPositive: (fieldName) => `O campo ${fieldName} deve ser um valor positivo.`,
-  IsDateString: (fieldName) => `O campo ${fieldName} deve ser uma data válida.`,
+  IsPositive: (fieldName: string) =>
+    `O campo ${fieldName} deve ser um valor positivo.`,
+  IsDateString: (fieldName: string) =>
+    `O campo ${fieldName} deve ser uma data válida.`,
 };

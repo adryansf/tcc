@@ -1,5 +1,9 @@
 // Interfaces
-import { Request, Response } from "@/app/common/interfaces/http.interfaces";
+import {
+  Request,
+  Response,
+  ReturnRoute,
+} from "@/app/common/interfaces/http.interfaces";
 
 // Service
 import { AuthService } from "./auth.service";
@@ -9,6 +13,7 @@ import { BaseController } from "@/app/common/classes/base-controller.class";
 
 // Dtos
 import { LoginAuthDto } from "./dtos/inputs/login-auth.dto";
+import { LoginAuthClientsOutputDto } from "./dtos/outputs/login-auth-clients.dto";
 
 // Helpers
 import { validator } from "@/app/common/helpers/validator.helper";
@@ -18,10 +23,13 @@ import { MESSAGES } from "@/app/common/messages";
 
 // Errors
 import { BadRequestError } from "@/app/common/errors/bad-request.error";
-import { LoginAuthClientsOutputDto } from "./dtos/outputs/login-auth-clients.dto";
+import { BaseError } from "@/app/common/errors/base.error";
 
 export interface IAuthController {
-  loginClients: (req: Request, res: Response) => any;
+  loginClients: (
+    req: Request,
+    res: Response
+  ) => Promise<ReturnRoute<LoginAuthClientsOutputDto | BaseError>>;
 }
 
 export class AuthController extends BaseController implements IAuthController {

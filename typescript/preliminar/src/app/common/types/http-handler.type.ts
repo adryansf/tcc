@@ -1,7 +1,3 @@
-import {
-  ErrorRequestHandler,
-  RequestHandler,
-  RequestParamHandler,
-} from "express";
+import { ErrorRequestHandler, RequestHandler } from "express";
 
 export type HttpHandler = ErrorRequestHandler | RequestHandler;

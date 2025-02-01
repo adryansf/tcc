@@ -25,3 +25,5 @@ export interface Request extends RequestExpress {
 }
 
 export interface Response extends ResponseExpress {}
+
+export interface ReturnRoute<T> extends ResponseExpress<T> {}

@@ -6,6 +6,12 @@ export const errorMessages = {
       CPFNotUnique: `O CPF já está em utilização.`,
     },
   },
+  account: {
+    BadRequest: {
+      BranchNotExists: `A agência informada não existe.`,
+    },
+    NotFound: "Conta não encontrada.",
+  },
   auth: {
     BadRequest: "O e-mail e/ou senha estão errados.",
   },

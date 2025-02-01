@@ -6,17 +6,17 @@ import {
 } from "@/app/common/interfaces/http.interfaces";
 
 // Service
-import { ClientsService } from "./clients.service";
+import { AccountsService } from "./accounts.service";
 
 // Entities
-import { ClientEntity } from "./entities/client.entity";
+import { AccountEntity } from "./entities/account.entity";
 
 // CommonClasses
 import { BaseController } from "@/app/common/classes/base-controller.class";
 
 // Dtos
-import { FindOneClientDto } from "./dtos/inputs/findOne-client.dto";
-import { CreateClientDto } from "./dtos/inputs/create-client.dto";
+import { CreateAccountDto } from "./dtos/inputs/create-account.dto";
+import { FindOneAccountDto } from "./dtos/inputs/findOne-account.dto";
 
 // Helpers
 import { validator } from "@/app/common/helpers/validator.helper";
@@ -28,29 +28,29 @@ import { MESSAGES } from "@/app/common/messages";
 import { BadRequestError } from "@/app/common/errors/bad-request.error";
 import { BaseError } from "@/app/common/errors/base.error";
 
-export interface IClientsController {
-  findOne: (
-    req: Request,
-    res: Response
-  ) => Promise<ReturnRoute<ClientEntity | BaseError>>;
+export interface IAccountsController {
   create: (
     req: Request,
     res: Response
-  ) => Promise<ReturnRoute<ClientEntity | BaseError>>;
+  ) => Promise<ReturnRoute<AccountEntity | BaseError>>;
+  findOne: (
+    req: Request,
+    res: Response
+  ) => Promise<ReturnRoute<AccountEntity | BaseError>>;
 }
 
-export class ClientsController
+export class AccountsController
   extends BaseController
-  implements IClientsController
+  implements IAccountsController
 {
-  constructor(private _service: ClientsService) {
+  constructor(private _service: AccountsService) {
     super();
   }
 
   async findOne(req: Request, res: Response) {
     const params = req.params;
 
-    const validation = await validator(FindOneClientDto, params);
+    const validation = await validator(FindOneAccountDto, params);
 
     if (validation.isLeft()) {
       return this.sendErrorResponse(
@@ -59,21 +59,25 @@ export class ClientsController
       );
     }
 
-    const result = await this._service.findOne(params.id);
+    const result = await this._service.findOne(
+      params.id,
+      req.auth.id,
+      req.auth.role
+    );
 
     if (result.isLeft()) {
       return this.sendErrorResponse(res, result.value);
     }
 
-    const client = new ClientEntity(result.value);
+    const account = new AccountEntity(result.value);
 
-    return this.sendSuccessResponse<ClientEntity>(res, client);
+    return this.sendSuccessResponse<AccountEntity>(res, account);
   }
 
   async create(req: Request, res: Response) {
-    const body = req.body as CreateClientDto;
+    const body = req.body as CreateAccountDto;
 
-    const validation = await validator(CreateClientDto, body);
+    const validation = await validator(CreateAccountDto, body);
 
     if (validation.isLeft()) {
       return this.sendErrorResponse(
@@ -82,14 +86,14 @@ export class ClientsController
       );
     }
 
-    const result = await this._service.create(body);
+    const result = await this._service.create(body, req.auth.id);
 
     if (result.isLeft()) {
       return this.sendErrorResponse(res, result.value);
     }
 
-    const client = new ClientEntity(result.value);
+    const account = new AccountEntity(result.value);
 
-    return this.sendSuccessResponse<ClientEntity>(res, client);
+    return this.sendSuccessResponse<AccountEntity>(res, account);
   }
 }
