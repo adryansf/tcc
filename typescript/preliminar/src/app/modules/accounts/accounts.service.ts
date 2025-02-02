@@ -63,7 +63,7 @@ export class AccountsService implements IAccountsService {
   ): Promise<Either<BaseError, AccountEntity>> {
     const permission = hasPermission(role, RoleEnum.MANAGER);
 
-    const account = await this._repositories.accounts.findById(id);
+    const account = await this._repositories.accounts.findById(id, true);
 
     if (!account) {
       return left(new NotFoundError(MESSAGES.error.account.NotFound));

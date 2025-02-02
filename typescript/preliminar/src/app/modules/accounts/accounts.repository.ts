@@ -14,6 +14,8 @@ export interface ICreateAccountData {
 interface IAccountsRepository {
   create: (data: ICreateAccountData) => Promise<AccountEntity | undefined>;
   findById: (id: string) => Promise<AccountEntity | undefined>;
+  addBalance: (id: string, value: number) => Promise<void>;
+  removeBalance: (id: string, value: number) => Promise<void>;
 }
 
 export class AccountsRepository implements IAccountsRepository {
@@ -25,16 +27,20 @@ export class AccountsRepository implements IAccountsRepository {
     return result?.rows[0] as AccountEntity | undefined;
   }
 
-  async findById(id: string) {
+  async findById(id: string, join: boolean = false) {
     const result = await db.query(
       `SELECT 
         c.id AS id,
         c.numero AS numero,
         c.saldo AS saldo,
         c.tipo AS tipo,
+        c."idAgencia" AS "idAgencia",
+        c."idCliente" AS "idCliente",
         c."dataDeCriacao" AS "dataDeCriacao",
-        c."dataDeAtualizacao" as "dataDeAtualizacao",
-        json_build_object(
+        c."dataDeAtualizacao" as "dataDeAtualizacao"
+        ${
+          join
+            ? `,json_build_object(
           'id', cli.id,
           'nome', cli.nome,
           'cpf', cli.cpf,
@@ -50,14 +56,46 @@ export class AccountsRepository implements IAccountsRepository {
           'telefone', a.telefone,
           'dataDeCriacao', a."dataDeCriacao",
           'dataDeAtualizacao', a."dataDeAtualizacao"
-        ) AS agencia
+        ) AS agencia`
+            : ""
+        }
       FROM "Conta" c
-      JOIN "Cliente" cli ON c."idCliente" = cli.id
-      JOIN "Agencia" a ON c."idAgencia" = a.id
+      ${
+        join
+          ? ` JOIN "Cliente" cli ON c."idCliente" = cli.id
+      JOIN "Agencia" a ON c."idAgencia" = a.id`
+          : ""
+      }
       WHERE c.id = $1 LIMIT 1`,
       [id]
     );
 
     return result?.rows[0] as AccountEntity | undefined;
+  }
+
+  async addBalance(id: string, value: number) {
+    const result = await db.query(
+      `
+      UPDATE "Conta"
+      SET saldo = saldo + $1
+      WHERE id = $2
+    `,
+      [value, id]
+    );
+
+    return;
+  }
+
+  async removeBalance(id: string, value: number) {
+    await db.query(
+      `
+      UPDATE "Conta"
+      SET saldo = saldo - $1
+      WHERE id = $2
+    `,
+      [value, id]
+    );
+
+    return;
   }
 }

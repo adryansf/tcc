@@ -9,8 +9,11 @@ export const errorMessages = {
   account: {
     BadRequest: {
       BranchNotExists: `A agência informada não existe.`,
+      BalanceNotEnough: `Saldo insuficiente para realizar a transação.`,
     },
     NotFound: "Conta não encontrada.",
+    NotFoundOrigin: `Conta de origem não encontrada.`,
+    NotFoundTarget: `Conta de destino não encontrada.`,
   },
   auth: {
     BadRequest: "O e-mail e/ou senha estão errados.",
