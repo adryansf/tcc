@@ -5,9 +5,6 @@ export const startDatabaseTransaction = () => {
 };
 
 export const endDatabaseTransaction = async () => {
-  // await db.query("ROLLBACK");
-  // return false;
-
   try {
     await db.query("COMMIT");
     return true;

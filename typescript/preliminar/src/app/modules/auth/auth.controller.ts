@@ -14,6 +14,7 @@ import { BaseController } from "@/app/common/classes/base-controller.class";
 // Dtos
 import { LoginAuthDto } from "./dtos/inputs/login-auth.dto";
 import { LoginAuthClientsOutputDto } from "./dtos/outputs/login-auth-clients.dto";
+import { LoginAuthManagersOutputDto } from "./dtos/outputs/login-auth-managers.dto";
 
 // Helpers
 import { validator } from "@/app/common/helpers/validator.helper";
@@ -56,6 +57,29 @@ export class AuthController extends BaseController implements IAuthController {
     }
 
     const output = new LoginAuthClientsOutputDto(result.value);
+
+    return this.sendSuccessResponse(res, output);
+  }
+
+  async loginManagers(req: Request, res: Response) {
+    const body = req.body as LoginAuthDto;
+
+    const validation = await validator(LoginAuthDto, body);
+
+    if (validation.isLeft()) {
+      return this.sendErrorResponse(
+        res,
+        new BadRequestError(MESSAGES.error.BadRequest, validation?.value.errors)
+      );
+    }
+
+    const result = await this._service.loginManagers(body);
+
+    if (result.isLeft()) {
+      return this.sendErrorResponse(res, result.value);
+    }
+
+    const output = new LoginAuthManagersOutputDto(result.value);
 
     return this.sendSuccessResponse(res, output);
   }

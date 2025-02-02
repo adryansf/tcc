@@ -1,6 +1,12 @@
 // Helpers
 import { hasPermission } from "@/app/common/helpers/permission.helper";
 
+// Database
+import {
+  endDatabaseTransaction,
+  startDatabaseTransaction,
+} from "@/database/transactions";
+
 // Entities
 import { TransactionEntity } from "./entities/transaction.entity";
 
@@ -10,6 +16,7 @@ import { BaseError } from "@/app/common/errors/base.error";
 import { BadRequestError } from "@/app/common/errors/bad-request.error";
 import { NotFoundError } from "@/app/common/errors/not-found.error";
 import { UnauthorizedError } from "@/app/common/errors/unauthorized.error";
+import { InternalServerError } from "@/app/common/errors/internal-server.error";
 
 // Messages
 import { MESSAGES } from "@/app/common/messages";
@@ -21,10 +28,6 @@ import { CreateTransactionDto } from "./dtos/inputs/create-transaction.dto";
 import { Repositories } from "./transactions.module";
 import { RoleEnum } from "@/common/enums/role.enum";
 import { TransactionTypeEnum } from "./enums/transaction-type.enum";
-import {
-  endDatabaseTransaction,
-  startDatabaseTransaction,
-} from "@/database/transactions";
 
 interface ITransactionsService {
   create: (
@@ -111,7 +114,11 @@ export class TransactionsService implements ITransactionsService {
         break;
     }
 
-    await endDatabaseTransaction();
+    const transactionSuccess = await endDatabaseTransaction();
+
+    if (!transactionSuccess) {
+      return left(new InternalServerError());
+    }
 
     return right(newTransaction);
   }

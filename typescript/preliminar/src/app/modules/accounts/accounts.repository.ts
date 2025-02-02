@@ -74,7 +74,7 @@ export class AccountsRepository implements IAccountsRepository {
   }
 
   async addBalance(id: string, value: number) {
-    const result = await db.query(
+    await db.query(
       `
       UPDATE "Conta"
       SET saldo = saldo + $1

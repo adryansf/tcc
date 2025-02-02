@@ -2,8 +2,8 @@ export const errorMessages = {
   client: {
     NotFound: "Cliente não encontrado.",
     BadRequest: {
-      EmailNotUnique: `O e-mail já está em utilização.`,
-      CPFNotUnique: `O CPF já está em utilização.`,
+      EmailNotUnique: `O e-mail está em utilização.`,
+      CPFNotUnique: `O CPF está em utilização.`,
     },
   },
   account: {
@@ -16,12 +16,13 @@ export const errorMessages = {
     NotFoundTarget: `Conta de destino não encontrada.`,
   },
   auth: {
-    BadRequest: "O e-mail e/ou senha estão errados.",
+    BadRequest: "O e-mail e/ou senha incorretos.",
   },
   Unauthorized:
     "Você não possui permissão suficiente para acessar esse recurso.",
   BadRequest:
     "A requisição contém dados inválidos. Verifique os campos e tente novamente.",
+  InternalServer: `Ocorreu uma falha inesperada. Contate o administrador.`,
   middleware: {
     auth: {
       BadRequest: {
