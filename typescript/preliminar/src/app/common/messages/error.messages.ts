@@ -18,6 +18,12 @@ export const errorMessages = {
   auth: {
     BadRequest: "O e-mail e/ou senha incorretos.",
   },
+  address: {
+    BadRequest: {
+      AlreadyExists: `O cliente possui um endereço cadastrado.`,
+    },
+    NotFound: "Endereço não encontrado.",
+  },
   Unauthorized:
     "Você não possui permissão suficiente para acessar esse recurso.",
   BadRequest:

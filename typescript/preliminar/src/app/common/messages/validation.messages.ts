@@ -13,4 +13,6 @@ export const validationMessages = {
     `O campo ${fieldName} deve ser um valor positivo.`,
   IsDateString: (fieldName: string) =>
     `O campo ${fieldName} deve ser uma data válida.`,
+  MaxLength: (fieldName: string, maxLength: number) =>
+    `O campo ${fieldName} deve ter no máximo ${maxLength} caracteres.`,
 };
