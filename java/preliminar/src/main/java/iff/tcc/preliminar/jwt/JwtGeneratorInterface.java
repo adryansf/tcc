@@ -2,11 +2,10 @@ package iff.tcc.preliminar.jwt;
 
 import iff.tcc.preliminar.entity.Cliente;
 import iff.tcc.preliminar.entity.Gerente;
-
-import java.util.Map;
+import iff.tcc.preliminar.entity.dto.AuthTokenDTO;
 
 public interface JwtGeneratorInterface {
-    Map<String, String> gerarTokenCliente(Cliente cliente);
+    AuthTokenDTO gerarTokenCliente(Cliente cliente);
 
-    Map<String, String> gerarTokenGerente(Gerente gerente);
+    AuthTokenDTO gerarTokenGerente(Gerente gerente);
 }

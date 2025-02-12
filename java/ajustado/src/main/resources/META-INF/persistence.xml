@@ -1,0 +1,19 @@
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             version="3.0">
+
+    <persistence-unit name="bankingPU">
+        <provider>org.hibernate.reactive.provider.ReactivePersistenceProvider</provider>
+
+        <properties>
+            <property name="hibernate.connection.url" value="jdbc:postgresql://localhost:5432/tcc_db"/>
+            <property name="hibernate.connection.username" value="tcc_user"/>
+            <property name="hibernate.connection.password" value="tcc_password"/>
+
+            <!-- Configuração reativa -->
+            <!--<property name="hibernate.connection.pool_size" value="5"/>-->
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+        </properties>
+    </persistence-unit>
+
+</persistence>

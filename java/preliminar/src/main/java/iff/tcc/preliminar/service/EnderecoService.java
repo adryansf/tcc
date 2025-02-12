@@ -1,8 +1,13 @@
 package iff.tcc.preliminar.service;
 
+import iff.tcc.preliminar.entity.Cliente;
 import iff.tcc.preliminar.entity.Endereco;
+import iff.tcc.preliminar.entity.dto.EnderecoDTO;
 import iff.tcc.preliminar.exception.NaoEncontradoException;
+import iff.tcc.preliminar.exception.NaoPermitidoException;
+import iff.tcc.preliminar.repository.ClienteRepository;
 import iff.tcc.preliminar.repository.EnderecoRepository;
+import iff.tcc.preliminar.utils.TokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,20 +19,43 @@ import java.util.UUID;
 public class EnderecoService {
 
     private final EnderecoRepository enderecoRepository;
+    private final TokenUtil tokenUtil;
+    private final ClienteRepository clienteRepository;
 
     public List<Endereco> findAll() {
+        var usuario = tokenUtil.extrairUsuario();
+
+        if (usuario.isCliente()) {
+            throw new NaoPermitidoException("Usuário não tem permissão para realizar essa ação");
+        }
+
         return enderecoRepository.findAll();
     }
 
     public Endereco findById(UUID id) {
-        return enderecoRepository.findById(id).orElseThrow(() -> new NaoEncontradoException(""));
+        var endereco = enderecoRepository.findById(id)
+                .orElseThrow(() -> new NaoEncontradoException("Endereço não encontrado"));
+
+        var usuario = tokenUtil.extrairUsuario();
+
+        if (usuario.isCliente() && !((Cliente) usuario.getUsuario()).getId().equals(endereco.getCliente().getId())) {
+            throw new NaoPermitidoException("Usuário não tem permissão para realizar essa ação");
+        }
+
+        return endereco;
     }
 
-    public Endereco save(Endereco endereco) {
-        return enderecoRepository.save(endereco);
+    public Endereco save(EnderecoDTO endereco) {
+        var usuario = tokenUtil.extrairUsuario();
+
+        if (usuario.isCliente() && !((Cliente) usuario.getUsuario()).getId().equals(endereco.getClienteId())) {
+            throw new NaoPermitidoException("Usuário não tem permissão para realizar essa ação");
+        }
+
+        return enderecoRepository.save(formatarEndereco(endereco));
     }
 
-    public Endereco update(UUID id, Endereco endereco) {
+    public Endereco update(UUID id, EnderecoDTO endereco) {
         Endereco existingEndereco = findById(id);
         existingEndereco.setLogradouro(endereco.getLogradouro());
         existingEndereco.setNumero(endereco.getNumero());
@@ -36,12 +64,27 @@ public class EnderecoService {
         existingEndereco.setCidade(endereco.getCidade());
         existingEndereco.setUf(endereco.getUf());
         existingEndereco.setCep(endereco.getCep());
-        existingEndereco.setCliente(endereco.getCliente());
+        existingEndereco.setCliente(clienteRepository.findById(endereco.getClienteId())
+                .orElseThrow(() -> new NaoEncontradoException("Cliente não encontrado")));
         return enderecoRepository.save(existingEndereco);
     }
 
     public void delete(UUID id) {
         Endereco endereco = findById(id);
         enderecoRepository.delete(endereco);
+    }
+
+    private Endereco formatarEndereco(EnderecoDTO novoEndereco) {
+        var endereco = new Endereco();
+        endereco.setLogradouro(novoEndereco.getLogradouro());
+        endereco.setNumero(novoEndereco.getNumero());
+        endereco.setComplemento(novoEndereco.getComplemento());
+        endereco.setBairro(novoEndereco.getBairro());
+        endereco.setCidade(novoEndereco.getCidade());
+        endereco.setUf(novoEndereco.getUf());
+        endereco.setCep(novoEndereco.getCep());
+        endereco.setCliente(clienteRepository.findById(novoEndereco.getClienteId())
+                .orElseThrow(() -> new NaoEncontradoException("Cliente não encontrado")));
+        return endereco;
     }
 }

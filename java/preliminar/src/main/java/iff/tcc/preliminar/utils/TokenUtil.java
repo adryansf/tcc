@@ -1,6 +1,7 @@
 package iff.tcc.preliminar.utils;
 
 import iff.tcc.preliminar.entity.dto.UsuarioDTO;
+import iff.tcc.preliminar.exception.NaoAutorizadoException;
 import iff.tcc.preliminar.exception.NaoEncontradoException;
 import iff.tcc.preliminar.repository.ClienteRepository;
 import iff.tcc.preliminar.repository.GerenteRepository;
@@ -9,6 +10,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -38,10 +40,10 @@ public class TokenUtil {
         String emissor = jwsClaims.getBody().getIssuer();
         String cargo = jwsClaims.getBody().get("cargo", String.class);
 
-        if (usuario.length() > 0 & emissor.equals(EMISSOR)) {
+        if (StringUtils.isNotEmpty(usuario) & emissor.equals(EMISSOR)) {
             return new UsernamePasswordAuthenticationToken(cargo, null, Collections.emptyList());
         }
-        return null;
+        throw new NaoAutorizadoException("Usuário não autorizado");
     }
 
     private static Jws<Claims> getClaimsJws(String jwtToken) {
@@ -63,10 +65,10 @@ public class TokenUtil {
             return UsuarioDTO.builder()
                     .cliente(true)
                     .gerente(false)
-                    .usuario(clienteRepository.findClienteByCpf(cpf)
+                    .usuario(clienteRepository.findByCpf(cpf)
                             .orElseThrow(() -> new NaoEncontradoException("Cliente não encontrado")))
                     .build();
-        }else if(cargo.equals("gerente")){
+        } else if (cargo.equals("gerente")) {
             return UsuarioDTO.builder()
                     .cliente(false)
                     .gerente(true)

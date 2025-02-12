@@ -1,17 +1,11 @@
 package iff.tcc.preliminar.controller;
 
 import iff.tcc.preliminar.entity.Gerente;
+import iff.tcc.preliminar.entity.dto.GerenteDTO;
 import iff.tcc.preliminar.service.GerenteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,12 +29,12 @@ public class GerenteController {
     }
 
     @PostMapping
-    public Gerente createGerente(@RequestBody Gerente gerente) {
+    public Gerente createGerente(@RequestBody GerenteDTO gerente) {
         return gerenteService.save(gerente);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Gerente> updateGerente(@PathVariable UUID id, @RequestBody Gerente gerente) {
+    public ResponseEntity<Gerente> updateGerente(@PathVariable UUID id, @RequestBody GerenteDTO gerente) {
         Gerente updatedGerente = gerenteService.update(id, gerente);
         return ResponseEntity.ok(updatedGerente);
     }

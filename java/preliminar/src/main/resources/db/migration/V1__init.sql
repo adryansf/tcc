@@ -1,33 +1,33 @@
 CREATE TABLE Cliente
 (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     nome              varchar        NOT NULL,
     cpf               varchar UNIQUE NOT NULL,
     telefone          varchar,
     dataDeNascimento  date,
     email             varchar UNIQUE NOT NULL,
     senha             varchar        NOT NULL,
-    dataDeCriacao     timestamp DEFAULT CURRENT_TIMESTAMP,
-    dataDeAtualizacao timestamp DEFAULT CURRENT_TIMESTAMP
+    dataDeCriacao     timestamp        DEFAULT CURRENT_TIMESTAMP,
+    dataDeAtualizacao timestamp        DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Gerente
 (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    idAgencia UUID NOT NULL,
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    idAgencia         UUID           NOT NULL,
     nome              varchar        NOT NULL,
     cpf               varchar UNIQUE NOT NULL,
     telefone          varchar,
     dataDeNascimento  date,
     email             varchar UNIQUE NOT NULL,
     senha             varchar        NOT NULL,
-    dataDeCriacao     timestamp DEFAULT CURRENT_TIMESTAMP,
-    dataDeAtualizacao timestamp DEFAULT CURRENT_TIMESTAMP
+    dataDeCriacao     timestamp        DEFAULT CURRENT_TIMESTAMP,
+    dataDeAtualizacao timestamp        DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Endereco
 (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     logradouro        varchar NOT NULL,
     numero            varchar NOT NULL,
     bairro            varchar NOT NULL,
@@ -35,42 +35,42 @@ CREATE TABLE Endereco
     uf                varchar NOT NULL,
     complemento       varchar,
     cep               varchar NOT NULL,
-    idCliente UUID NOT NULL,
-    dataDeCriacao     timestamp DEFAULT CURRENT_TIMESTAMP,
-    dataDeAtualizacao timestamp DEFAULT CURRENT_TIMESTAMP
+    idCliente         UUID    NOT NULL,
+    dataDeCriacao     timestamp        DEFAULT CURRENT_TIMESTAMP,
+    dataDeAtualizacao timestamp        DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Agencia
 (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     nome              varchar        NOT NULL,
     telefone          varchar,
     numero            varchar UNIQUE NOT NULL,
-    dataDeCriacao     timestamp DEFAULT CURRENT_TIMESTAMP,
-    dataDeAtualizacao timestamp DEFAULT CURRENT_TIMESTAMP
+    dataDeCriacao     timestamp        DEFAULT CURRENT_TIMESTAMP,
+    dataDeAtualizacao timestamp        DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Conta
 (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id                UUID PRIMARY KEY        DEFAULT gen_random_uuid(),
     numero            varchar UNIQUE NOT NULL,
     saldo             decimal(15, 2) NOT NULL DEFAULT 0.00,
     tipo              varchar        NOT NULL, -- Tipo será tratado no back-end
-    idAgencia UUID NOT NULL,
-    idCliente UUID NOT NULL,
+    idAgencia         UUID           NOT NULL,
+    idCliente         UUID           NOT NULL,
     dataDeCriacao     timestamp               DEFAULT CURRENT_TIMESTAMP,
     dataDeAtualizacao timestamp               DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE Transacao
 (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    valor         decimal(15, 2) NOT NULL,
-    data          timestamp DEFAULT CURRENT_TIMESTAMP,
-    tipo          varchar        NOT NULL, -- Tipo será tratado no back-end
-    idContaOrigem UUID NOT NULL,
-    idContaDestino UUID NOT NULL,
-    dataDeCriacao timestamp DEFAULT CURRENT_TIMESTAMP
+    id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    valor          decimal(15, 2) NOT NULL,
+    data           timestamp        DEFAULT CURRENT_TIMESTAMP,
+    tipo           varchar        NOT NULL, -- Tipo será tratado no back-end
+    idContaOrigem  UUID           NOT NULL,
+    idContaDestino UUID           NOT NULL,
+    dataDeCriacao  timestamp        DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Definição de relações
@@ -96,10 +96,12 @@ CREATE
 OR
 REPLACE FUNCTION atualizar_data_de_atualizacao()
 RETURNS TRIGGER AS $$
-BEGIN NEW.dataDeAtualizacao = CURRENT_TIMESTAMP;
+BEGIN NEW.dataDeAtualizacao
+= CURRENT_TIMESTAMP;
 RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$
+LANGUAGE plpgsql;
 
 
 CREATE TRIGGER trigger_update_cliente

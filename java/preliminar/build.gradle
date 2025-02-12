@@ -35,12 +35,18 @@ dependencies {
     implementation 'org.flywaydb:flyway-core:11.3.0'
     // https://mvnrepository.com/artifact/org.flywaydb/flyway-database-postgresql
     runtimeOnly 'org.flywaydb:flyway-database-postgresql:11.3.0'
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation 'org.apache.commons:commons-lang3:3.17.0'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // https://mvnrepository.com/artifact/br.com.caelum.stella/caelum-stella-core
+    implementation 'br.com.caelum.stella:caelum-stella-core:2.1.7'
+
 }
 
 tasks.named('test') {

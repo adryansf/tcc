@@ -1,6 +1,5 @@
 package iff.tcc.preliminar.filters;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import iff.tcc.preliminar.exception.NaoAutorizadoException;
 import iff.tcc.preliminar.utils.TokenUtil;
 import jakarta.servlet.FilterChain;
@@ -21,11 +20,11 @@ public class AuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        if(request.getHeader("Authorization") != null){
+        if (request.getHeader("Authorization") != null) {
             Authentication auth = TokenUtil.decodeToken(request);
-            if (auth != null){
+            if (auth != null) {
                 SecurityContextHolder.getContext().setAuthentication(auth);
-            } else{
+            } else {
                 throw new NaoAutorizadoException("Usuário não autorizado");
             }
         }

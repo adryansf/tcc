@@ -4,6 +4,7 @@ import iff.tcc.preliminar.filters.AuthFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -19,8 +20,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/clientes").permitAll()
+                        .anyRequest().authenticated()
                 ).csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/auth/**"))
+                        .ignoringRequestMatchers("/**"))
                 .addFilterBefore(new AuthFilter(), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
