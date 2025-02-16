@@ -8,4 +8,5 @@ import java.util.UUID;
 
 @ApplicationScoped
 public class AgenciaRepository implements PanacheRepositoryBase<Agencia, UUID> {
+
 }

@@ -1,38 +1,42 @@
-package iff.tcc.preliminar.service;
+package iff.tcc.ajustado.service;
 
-import iff.tcc.preliminar.entity.Cliente;
-import iff.tcc.preliminar.entity.Conta;
-import iff.tcc.preliminar.entity.Transacao;
-import iff.tcc.preliminar.entity.dto.TransacaoDTO;
-import iff.tcc.preliminar.entity.enums.TipoDeTransacao;
-import iff.tcc.preliminar.exception.NaoEncontradoException;
-import iff.tcc.preliminar.exception.NaoPermitidoException;
-import iff.tcc.preliminar.exception.RegistroInvalidoException;
-import iff.tcc.preliminar.repository.ContaRepository;
-import iff.tcc.preliminar.repository.TransacaoRepository;
-import iff.tcc.preliminar.utils.TokenUtil;
+import iff.tcc.ajustado.entity.Cliente;
+import iff.tcc.ajustado.entity.Conta;
+import iff.tcc.ajustado.entity.Transacao;
+import iff.tcc.ajustado.entity.dto.TransacaoDTO;
+import iff.tcc.ajustado.entity.enums.TipoDeTransacao;
+import iff.tcc.ajustado.exception.NaoEncontradoException;
+import iff.tcc.ajustado.exception.NaoPermitidoException;
+import iff.tcc.ajustado.exception.RegistroInvalidoException;
+import iff.tcc.ajustado.repository.ContaRepository;
+import iff.tcc.ajustado.repository.TransacaoRepository;
+import iff.tcc.ajustado.utils.TokenUtil;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
-@Service
-@RequiredArgsConstructor
+@ApplicationScoped
 public class TransacaoService {
 
-    private final TransacaoRepository transacaoRepository;
-    private final ContaRepository contaRepository;
-    private final TokenUtil tokenUtil;
+    @Inject
+    TransacaoRepository transacaoRepository;
 
-    public List<Transacao> findAll() {
-        return transacaoRepository.findAll();
+    @Inject
+    ContaRepository contaRepository;
+
+    @Inject
+    TokenUtil tokenUtil;
+
+    public List<Transacao> listar() {
+        return transacaoRepository.listAll();
     }
 
-    public Transacao findById(UUID id) {
-        return transacaoRepository.findById(id)
-                .orElseThrow(() -> new NaoEncontradoException("Transaçao nao encontrada"));
+    public Transacao buscar(UUID id) {
+        return transacaoRepository.findByIdOptional(id)
+                .orElseThrow(() -> new NaoEncontradoException("Transacao nao encontrada"));
     }
 
     @Transactional
@@ -41,7 +45,7 @@ public class TransacaoService {
             throw new RegistroInvalidoException("A conta de destino nao pode ser a mesma conta de origem");
         }
 
-        var contaOrigem = contaRepository.findById(transacao.getContaOrigemId())
+        var contaOrigem = contaRepository.findByIdOptional(transacao.getContaOrigemId())
                 .orElseThrow(() -> new NaoEncontradoException("Conta de Origem não encontrada"));
 
         var usuario = tokenUtil.extrairUsuario();
@@ -54,21 +58,25 @@ public class TransacaoService {
             throw new RegistroInvalidoException("Saldo insuficiente");
         }
         contaOrigem.setSaldo(contaOrigem.getSaldo() - transacao.getValor());
-        contaRepository.save(contaOrigem);
+        contaRepository.persist(contaOrigem);
 
         if(transacao.getContaDestinoId() != null) {
-            var contaDestino = contaRepository.findById(transacao.getContaDestinoId())
+            var contaDestino = contaRepository.findByIdOptional(transacao.getContaDestinoId())
                     .orElseThrow(() -> new NaoEncontradoException("Conta de Destino não encontrada"));
 
             contaDestino.setSaldo(contaDestino.getSaldo() + transacao.getValor());
-            contaRepository.save(contaDestino);
+            contaRepository.persist(contaDestino);
 
-            return transacaoRepository.save(formatarTransacao(transacao, contaOrigem, contaDestino));
+            var novaTran = formatarTransacao(transacao, contaOrigem, contaDestino);
+            transacaoRepository.persist(novaTran);
+            return novaTran;
         }
 
-        return transacaoRepository.save(formatarTransacao(transacao, contaOrigem));
-    }
+        var novaTran = formatarTransacao(transacao, contaOrigem);
+        transacaoRepository.persist(novaTran);
+        return novaTran;
 
+    }
     private Transacao formatarTransacao(TransacaoDTO transacao, Conta contaOrigem, Conta contaDestino) {
         var novaTransacao = new Transacao();
         novaTransacao.setContaOrigem(contaOrigem);

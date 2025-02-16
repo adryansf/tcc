@@ -1,5 +1,6 @@
 package iff.tcc.ajustado.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -16,5 +17,6 @@ public class Cliente extends EntidadeBase {
     private String telefone;
     private Date dataDeNascimento;
     private String email;
+    @JsonIgnore
     private String senha;
 }

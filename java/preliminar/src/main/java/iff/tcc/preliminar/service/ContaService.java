@@ -5,6 +5,7 @@ import iff.tcc.preliminar.entity.Conta;
 import iff.tcc.preliminar.entity.dto.ContaDTO;
 import iff.tcc.preliminar.exception.NaoEncontradoException;
 import iff.tcc.preliminar.exception.NaoPermitidoException;
+import iff.tcc.preliminar.exception.RegistroInvalidoException;
 import iff.tcc.preliminar.repository.AgenciaRepository;
 import iff.tcc.preliminar.repository.ClienteRepository;
 import iff.tcc.preliminar.repository.ContaRepository;
@@ -59,6 +60,11 @@ public class ContaService {
 
     public void delete(UUID id) {
         Conta conta = findById(id);
+
+        if(conta.getSaldo() != 0) {
+            throw new RegistroInvalidoException("A conta precisa ter saldo zerado para deletar!");
+        }
+
         contaRepository.delete(conta);
     }
 

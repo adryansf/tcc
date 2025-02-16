@@ -2,6 +2,7 @@ package iff.tcc.ajustado.controller;
 
 import iff.tcc.ajustado.entity.Cliente;
 import iff.tcc.ajustado.service.ClienteService;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -15,9 +16,23 @@ public class ClienteController {
     ClienteService clienteService;
 
     @GET
+    @RolesAllowed({"gerente"})
+    public Iterable<Cliente> listarClientes() {
+        return clienteService.listar();
+    }
+
+    @GET
     @Path("/{id}")
+    @RolesAllowed({"cliente", "gerente"})
     public Cliente buscarCliente(@PathParam("id") UUID id) {
         return clienteService.buscarPorId(id);
+    }
+
+    @PUT
+    @Path("/{id}")
+    @RolesAllowed({"cliente", "gerente"})
+    public Cliente atualizarCliente(@PathParam("id") UUID id, Cliente cliente) {
+        return clienteService.update(id, cliente);
     }
 
     @POST

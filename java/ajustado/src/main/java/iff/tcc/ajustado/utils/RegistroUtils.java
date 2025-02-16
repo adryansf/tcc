@@ -14,7 +14,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.util.Date;
 import java.util.regex.Pattern;
 
-@ApplicationScoped
 public class RegistroUtils {
 
     public static Cliente formatarNovoCliente(Cliente cliente) {

@@ -1,10 +1,11 @@
 package iff.tcc.preliminar.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import iff.tcc.preliminar.entity.Cliente;
+import iff.tcc.preliminar.entity.Gerente;
 import iff.tcc.preliminar.entity.dto.UsuarioDTO;
 import iff.tcc.preliminar.exception.NaoAutorizadoException;
 import iff.tcc.preliminar.exception.NaoEncontradoException;
-import iff.tcc.preliminar.repository.ClienteRepository;
-import iff.tcc.preliminar.repository.GerenteRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -25,8 +26,7 @@ public class TokenUtil {
 
     private static final String EMISSOR = "e6AXaA6D58$2SV.+";
     private static final String TOKEN_KEY_SECRET = "x![dl43;@![g@ltK[IV(]bp)r,=a^42%";
-    private final ClienteRepository clienteRepository;
-    private final GerenteRepository gerenteRepository;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static Authentication decodeToken(HttpServletRequest request) {
 
@@ -58,24 +58,26 @@ public class TokenUtil {
         String jwtToken = requestAttributes.getRequest().getHeader("Authorization");
         jwtToken = jwtToken.replace("Bearer ", "");
         Jws<Claims> jwsClaims = getClaimsJws(jwtToken);
-        String cpf = jwsClaims.getBody().getSubject();
+        String usuario = jwsClaims.getBody().getSubject();
         String cargo = jwsClaims.getBody().get("cargo", String.class);
 
-        if (cargo.equals("cliente")) {
-            return UsuarioDTO.builder()
-                    .cliente(true)
-                    .gerente(false)
-                    .usuario(clienteRepository.findByCpf(cpf)
-                            .orElseThrow(() -> new NaoEncontradoException("Cliente não encontrado")))
-                    .build();
-        } else if (cargo.equals("gerente")) {
-            return UsuarioDTO.builder()
-                    .cliente(false)
-                    .gerente(true)
-                    .usuario(gerenteRepository.findByCpf(cpf)
-                            .orElseThrow(() -> new NaoEncontradoException("Gerente não encontrado")))
-                    .build();
+        try {
+            if ("cliente".equals(cargo)) {
+                return UsuarioDTO.builder()
+                        .cliente(true)
+                        .gerente(false)
+                        .usuario(objectMapper.readValue(usuario, Cliente.class))
+                        .build();
+            } else if ("gerente".equals(cargo)) {
+                return UsuarioDTO.builder()
+                        .cliente(false)
+                        .gerente(true)
+                        .usuario(objectMapper.readValue(usuario, Gerente.class))
+                        .build();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return null;
+        throw new NaoAutorizadoException("Cargo inválido");
     }
 }
