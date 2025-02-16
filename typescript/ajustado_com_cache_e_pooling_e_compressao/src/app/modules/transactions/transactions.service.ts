@@ -1,0 +1,175 @@
+// Helpers
+import { hasPermission } from "@/app/common/helpers/permission.helper";
+
+// Database
+import {
+  endDatabaseTransaction,
+  startDatabaseTransaction,
+} from "@/database/transactions";
+
+// Entities
+import { TransactionEntity } from "./entities/transaction.entity";
+
+// Errors
+import { Either, left, right } from "@/app/common/errors/either";
+import { BaseError } from "@/app/common/errors/base.error";
+import { BadRequestError } from "@/app/common/errors/bad-request.error";
+import { NotFoundError } from "@/app/common/errors/not-found.error";
+import { UnauthorizedError } from "@/app/common/errors/unauthorized.error";
+import { InternalServerError } from "@/app/common/errors/internal-server.error";
+
+// Messages
+import { MESSAGES } from "@/app/common/messages";
+
+// Dtos
+import { CreateTransactionDto } from "./dtos/inputs/create-transaction.dto";
+
+// Types
+import { Repositories } from "./transactions.module";
+import { RoleEnum } from "@/common/enums/role.enum";
+import { TransactionTypeEnum } from "./enums/transaction-type.enum";
+
+// Cache
+import { CacheService } from "@/app/common/cache/cache.service";
+
+interface ITransactionsService {
+  create: (
+    data: CreateTransactionDto,
+    idOriginAccount: string,
+    idClient: string
+  ) => Promise<Either<BaseError, TransactionEntity>>;
+  findAll: (
+    id: string,
+    idClient: string,
+    role: RoleEnum
+  ) => Promise<Either<BaseError, TransactionEntity[]>>;
+}
+
+export class TransactionsService implements ITransactionsService {
+  constructor(
+    private _repositories: Repositories,
+    private _cacheService: CacheService
+  ) {}
+
+  async create(
+    data: Required<CreateTransactionDto>,
+    idOriginAccount: string,
+    idClient: string
+  ): Promise<Either<BaseError, TransactionEntity>> {
+    // Verificar se contas existem
+    const originAccount = await this._repositories.accounts.findById(
+      idOriginAccount
+    );
+
+    if (!originAccount) {
+      return left(new NotFoundError(MESSAGES.error.account.NotFoundOrigin));
+    }
+
+    if (originAccount.idCliente !== idClient) {
+      return left(new UnauthorizedError());
+    }
+
+    const targetAccount = await this._repositories.accounts.findById(
+      data.idContaDestino
+    );
+
+    if (!targetAccount) {
+      return left(new NotFoundError(MESSAGES.error.account.NotFoundTarget));
+    }
+
+    // Verificar o saldo da conta
+    if (
+      (data.tipo === TransactionTypeEnum.TRANSFER ||
+        data.tipo === TransactionTypeEnum.WITHDRAWAL) &&
+      originAccount.saldo < data.valor
+    ) {
+      return left(
+        new BadRequestError(MESSAGES.error.account.BadRequest.BalanceNotEnough)
+      );
+    }
+
+    await startDatabaseTransaction();
+
+    const newTransaction = await this._repositories.transactions.create({
+      ...data,
+      idContaOrigem: idOriginAccount,
+    });
+
+    switch (data.tipo) {
+      case TransactionTypeEnum.DEPOSIT:
+        await this._repositories.accounts.addBalance(
+          data.idContaDestino,
+          data.valor
+        );
+        break;
+      case TransactionTypeEnum.TRANSFER:
+        await this._repositories.accounts.removeBalance(
+          idOriginAccount,
+          data.valor
+        );
+        await this._repositories.accounts.addBalance(
+          data.idContaDestino,
+          data.valor
+        );
+        // Reset cache para conta de destino
+        await this._cacheService.reset(`transactions:${data.idContaDestino}`);
+        break;
+      case TransactionTypeEnum.WITHDRAWAL:
+        await this._repositories.accounts.removeBalance(
+          idOriginAccount,
+          data.valor
+        );
+        break;
+    }
+
+    const transactionSuccess = await endDatabaseTransaction();
+
+    if (!transactionSuccess) {
+      return left(new InternalServerError());
+    }
+
+    // Reset cache para conta de origem
+    await this._cacheService.reset(`transactions:${idOriginAccount}`);
+
+    return right(newTransaction);
+  }
+
+  async findAll(
+    idOriginAccount: string,
+    idClient: string,
+    role: RoleEnum
+  ): Promise<Either<BaseError, TransactionEntity[]>> {
+    // Cache
+    const cachedTransactions = await this._cacheService.get<
+      TransactionEntity[]
+    >(`transactions:${idOriginAccount}`);
+
+    if (cachedTransactions) {
+      return right(cachedTransactions);
+    }
+
+    const permission = hasPermission(role, RoleEnum.MANAGER);
+
+    const account = await this._repositories.accounts.findById(idOriginAccount);
+
+    if (!account) {
+      return left(new NotFoundError(MESSAGES.error.account.NotFound));
+    }
+
+    if (account.idCliente !== idClient && !permission) {
+      return left(new UnauthorizedError());
+    }
+
+    const transactions = await this._repositories.transactions.findAll(
+      idOriginAccount
+    );
+
+    // Set cache
+    await this._cacheService.set(
+      `transactions:${idOriginAccount}`,
+      transactions
+    );
+
+    return right(transactions);
+  }
+}

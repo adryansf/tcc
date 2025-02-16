@@ -1,16 +1,11 @@
 import { BaseError } from "@/common/errors/base.error";
-import {
-  Request,
-  Response,
-  NextFunction,
-} from "@/app/common/interfaces/http.interfaces";
+import { Request, Response } from "@/app/common/interfaces/http.interfaces";
 
 // Middleware de tratamento de erros
 export function errorHandler(
   err: Error | BaseError,
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) {
   // Verifica se é uma instância de AppError
   const statusCode = err instanceof BaseError ? err.statusCode : 500;
@@ -20,7 +15,7 @@ export function errorHandler(
   console.error(`[${new Date().toISOString()}] ${err.message}`);
 
   // Retorna a resposta do erro
-  res.status(statusCode).json({
+  res.code(statusCode).send({
     statusCode,
     message,
   });
