@@ -8,7 +8,8 @@ import lombok.Data;
 @Table(name = "Conta")
 @Data
 public class Conta extends EntidadeBase {
-    private String numero;
+    @Column(insertable = false)
+    private Integer numero;
     private long saldo;
     @Enumerated(EnumType.STRING)
     private TipoDeConta tipo;

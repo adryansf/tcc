@@ -1,6 +1,5 @@
 package iff.tcc.ajustado.controller;
 
-import iff.tcc.ajustado.entity.dto.AuthTokenDTO;
 import iff.tcc.ajustado.entity.dto.LoginDTO;
 import iff.tcc.ajustado.service.AutenticacaoService;
 import jakarta.inject.Inject;
@@ -10,7 +9,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import lombok.RequiredArgsConstructor;
 
 @Path("/auth/login")
 @Produces(MediaType.APPLICATION_JSON)

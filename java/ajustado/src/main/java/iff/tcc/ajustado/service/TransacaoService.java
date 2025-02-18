@@ -1,10 +1,9 @@
 package iff.tcc.ajustado.service;
 
-import iff.tcc.ajustado.entity.Cliente;
 import iff.tcc.ajustado.entity.Conta;
 import iff.tcc.ajustado.entity.Transacao;
+import iff.tcc.ajustado.entity.dto.TransacaoContaSemSaldoDTO;
 import iff.tcc.ajustado.entity.dto.TransacaoDTO;
-import iff.tcc.ajustado.entity.enums.TipoDeTransacao;
 import iff.tcc.ajustado.exception.NaoEncontradoException;
 import iff.tcc.ajustado.exception.NaoPermitidoException;
 import iff.tcc.ajustado.exception.RegistroInvalidoException;
@@ -14,6 +13,7 @@ import iff.tcc.ajustado.utils.TokenUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,8 +30,17 @@ public class TransacaoService {
     @Inject
     TokenUtil tokenUtil;
 
-    public List<Transacao> listar() {
-        return transacaoRepository.listAll();
+    public List<TransacaoContaSemSaldoDTO> listar(UUID idConta) {
+        var conta = contaRepository.findByIdOptional(idConta)
+                .orElseThrow(() -> new NaoEncontradoException("Conta não encontrada"));
+
+        var usuario = tokenUtil.extrairUsuario();
+
+        if (usuario.isCliente() && !usuario.getUsuario().getId().equals(conta.getCliente().getId())) {
+            throw new NaoPermitidoException("Usuário não tem permissão para realizar essa ação");
+        }
+
+        return transacaoRepository.findByConta(idConta);
     }
 
     public Transacao buscar(UUID id) {
@@ -39,57 +48,106 @@ public class TransacaoService {
                 .orElseThrow(() -> new NaoEncontradoException("Transacao nao encontrada"));
     }
 
+
     @Transactional
-    public Transacao salvar(TransacaoDTO transacao) {
-        if (transacao.getContaDestinoId() == transacao.getContaOrigemId()) {
+    public void salvar(TransacaoDTO transacao) {
+        if (transacao.getIdContaDestino() == transacao.getIdContaOrigem()) {
             throw new RegistroInvalidoException("A conta de destino nao pode ser a mesma conta de origem");
         }
 
-        var contaOrigem = contaRepository.findByIdOptional(transacao.getContaOrigemId())
+        switch (transacao.getTipo()) {
+            case SAQUE -> salvarSaque(transacao);
+
+            case DEPOSITO -> salvarDeposito(transacao);
+
+            case TRANSFERENCIA -> salvarTransferencia(transacao);
+
+            case null, default -> throw new RegistroInvalidoException("Tipo de transação inválido");
+        }
+    }
+
+    private void salvarDeposito(TransacaoDTO transacao) {
+        if (transacao.getIdContaDestino() == null) {
+            throw new RegistroInvalidoException("Conta de Destino é obrigatória");
+        }
+
+        var contaDestino = contaRepository.findByIdOptional(transacao.getIdContaDestino())
                 .orElseThrow(() -> new NaoEncontradoException("Conta de Origem não encontrada"));
 
         var usuario = tokenUtil.extrairUsuario();
 
-        if (usuario.isCliente() && !((Cliente) usuario.getUsuario()).getId().equals(contaOrigem.getCliente().getId())) {
+        if (usuario.isCliente() && !usuario.getUsuario().getId().equals(contaDestino.getCliente().getId())) {
             throw new NaoPermitidoException("Usuário não tem permissão para realizar essa ação");
         }
 
-        if (contaOrigem.getSaldo() < transacao.getValor() && transacao.getTipo() != TipoDeTransacao.DEPOSITO) {
+        contaDestino.setSaldo(contaDestino.getSaldo() + transacao.getValor());
+        contaRepository.persist(contaDestino);
+
+        transacaoRepository.persist(formatarTransacao(transacao, null, contaDestino));
+    }
+
+    private void salvarSaque(TransacaoDTO transacao) {
+        if (transacao.getIdContaOrigem() == null) {
+            throw new RegistroInvalidoException("Conta de Origem é obrigatória");
+        }
+
+        var contaOrigem = contaRepository.findByIdOptional(transacao.getIdContaOrigem())
+                .orElseThrow(() -> new NaoEncontradoException("Conta de Origem não encontrada"));
+
+        var usuario = tokenUtil.extrairUsuario();
+
+        if (usuario.isCliente() && !usuario.getUsuario().getId().equals(contaOrigem.getCliente().getId())) {
+            throw new NaoPermitidoException("Usuário não tem permissão para realizar essa ação");
+        }
+
+        if (contaOrigem.getSaldo() < transacao.getValor()) {
             throw new RegistroInvalidoException("Saldo insuficiente");
         }
+
         contaOrigem.setSaldo(contaOrigem.getSaldo() - transacao.getValor());
         contaRepository.persist(contaOrigem);
 
-        if(transacao.getContaDestinoId() != null) {
-            var contaDestino = contaRepository.findByIdOptional(transacao.getContaDestinoId())
-                    .orElseThrow(() -> new NaoEncontradoException("Conta de Destino não encontrada"));
+        transacaoRepository.persist(formatarTransacao(transacao, contaOrigem, null));
+    }
 
-            contaDestino.setSaldo(contaDestino.getSaldo() + transacao.getValor());
-            contaRepository.persist(contaDestino);
-
-            var novaTran = formatarTransacao(transacao, contaOrigem, contaDestino);
-            transacaoRepository.persist(novaTran);
-            return novaTran;
+    private void salvarTransferencia(TransacaoDTO transacao) {
+        if (transacao.getIdContaOrigem() == null) {
+            throw new RegistroInvalidoException("Conta de Origem é obrigatória");
         }
 
-        var novaTran = formatarTransacao(transacao, contaOrigem);
-        transacaoRepository.persist(novaTran);
-        return novaTran;
+        if (transacao.getIdContaDestino() == null) {
+            throw new RegistroInvalidoException("Conta de Destino é obrigatória");
+        }
 
+        var contaOrigem = contaRepository.findByIdOptional(transacao.getIdContaOrigem())
+                .orElseThrow(() -> new NaoEncontradoException("Conta de Origem não encontrada"));
+
+        var contaDestino = contaRepository.findByIdOptional(transacao.getIdContaDestino())
+                .orElseThrow(() -> new NaoEncontradoException("Conta de Destino não encontrada"));
+
+        var usuario = tokenUtil.extrairUsuario();
+
+        if (usuario.isCliente() && !usuario.getUsuario().getId().equals(contaOrigem.getCliente().getId())) {
+            throw new NaoPermitidoException("Usuário não tem permissão para realizar essa ação");
+        }
+
+        if (contaOrigem.getSaldo() < transacao.getValor()) {
+            throw new RegistroInvalidoException("Saldo insuficiente");
+        }
+
+        contaOrigem.setSaldo(contaOrigem.getSaldo() - transacao.getValor());
+        contaRepository.persist(contaOrigem);
+
+        contaDestino.setSaldo(contaDestino.getSaldo() + transacao.getValor());
+        contaRepository.persist(contaDestino);
+
+        transacaoRepository.persist(formatarTransacao(transacao, contaOrigem, contaDestino));
     }
+
     private Transacao formatarTransacao(TransacaoDTO transacao, Conta contaOrigem, Conta contaDestino) {
         var novaTransacao = new Transacao();
         novaTransacao.setContaOrigem(contaOrigem);
         novaTransacao.setContaDestino(contaDestino);
-        novaTransacao.setValor(transacao.getValor());
-        novaTransacao.setTipo(transacao.getTipo());
-
-        return novaTransacao;
-    }
-
-    private Transacao formatarTransacao(TransacaoDTO transacao, Conta contaOrigem) {
-        var novaTransacao = new Transacao();
-        novaTransacao.setContaOrigem(contaOrigem);
         novaTransacao.setValor(transacao.getValor());
         novaTransacao.setTipo(transacao.getTipo());
 

@@ -6,6 +6,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +19,7 @@ public class AgenciaController {
     private AgenciaService agenciaService;
 
     @GET
+    @RolesAllowed({"gerente", "cliente"})
     public List<Agencia> listar() {
         return agenciaService.listar();
     }
@@ -30,8 +32,9 @@ public class AgenciaController {
 
     @POST
     @RolesAllowed("gerente")
-    public Agencia criar(Agencia agencia) {
-        return agenciaService.salvar(agencia);
+    public Response criar(Agencia agencia) {
+        agenciaService.salvar(agencia);
+        return Response.status(Response.Status.CREATED).build();
     }
 
     @PUT

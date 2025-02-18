@@ -60,8 +60,5 @@ public class AgenciaService {
         if (StringUtils.isEmpty(agencia.getTelefone())) {
             throw new IllegalArgumentException("Telefone da agência é obrigatório");
         }
-        if (StringUtils.isEmpty(agencia.getNumero())) {
-            throw new IllegalArgumentException("Número da agência é obrigatório");
-        }
     }
 }

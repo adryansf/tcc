@@ -1,3 +1,4 @@
+-- Criação das tabelas
 CREATE TABLE Cliente
 (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -43,9 +44,9 @@ CREATE TABLE Endereco
 CREATE TABLE Agencia
 (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    nome              varchar        NOT NULL,
+    nome              varchar       NOT NULL,
     telefone          varchar,
-    numero            varchar UNIQUE NOT NULL,
+    numero            SERIAL UNIQUE NOT NULL,
     dataDeCriacao     timestamp        DEFAULT CURRENT_TIMESTAMP,
     dataDeAtualizacao timestamp        DEFAULT CURRENT_TIMESTAMP
 );
@@ -53,7 +54,7 @@ CREATE TABLE Agencia
 CREATE TABLE Conta
 (
     id                UUID PRIMARY KEY        DEFAULT gen_random_uuid(),
-    numero            varchar UNIQUE NOT NULL,
+    numero            SERIAL UNIQUE  NOT NULL,
     saldo             decimal(15, 2) NOT NULL DEFAULT 0.00,
     tipo              varchar        NOT NULL, -- Tipo será tratado no back-end
     idAgencia         UUID           NOT NULL,
@@ -66,10 +67,9 @@ CREATE TABLE Transacao
 (
     id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     valor          decimal(15, 2) NOT NULL,
-    data           timestamp        DEFAULT CURRENT_TIMESTAMP,
     tipo           varchar        NOT NULL, -- Tipo será tratado no back-end
-    idContaOrigem  UUID           NOT NULL,
-    idContaDestino UUID           NOT NULL,
+    idContaOrigem  UUID,
+    idContaDestino UUID,
     dataDeCriacao  timestamp        DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -92,18 +92,19 @@ ALTER TABLE Transacao
 ALTER TABLE Transacao
     ADD CONSTRAINT fk_transacao_conta_destino FOREIGN KEY (idContaDestino) REFERENCES Conta (id);
 
+-- Trigger para atualização automática de timestamps
 CREATE
-OR
-REPLACE FUNCTION atualizar_data_de_atualizacao()
+OR REPLACE FUNCTION atualizar_data_de_atualizacao()
 RETURNS TRIGGER AS $$
-BEGIN NEW.dataDeAtualizacao
+BEGIN
+  NEW.dataDeAtualizacao
 = CURRENT_TIMESTAMP;
 RETURN NEW;
 END;
 $$
 LANGUAGE plpgsql;
 
-
+-- Adicionar triggers para tabelas relevantes
 CREATE TRIGGER trigger_update_cliente
     BEFORE UPDATE
     ON Cliente

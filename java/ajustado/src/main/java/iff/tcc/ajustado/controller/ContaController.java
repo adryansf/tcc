@@ -2,11 +2,13 @@ package iff.tcc.ajustado.controller;
 
 import iff.tcc.ajustado.entity.Conta;
 import iff.tcc.ajustado.entity.dto.ContaDTO;
+import iff.tcc.ajustado.entity.dto.ContaSemSaldoDTO;
 import iff.tcc.ajustado.service.ContaService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,9 +22,9 @@ public class ContaController {
     ContaService contaService;
 
     @GET
-    @RolesAllowed("gerente")
-    public List<Conta> getContas() {
-        return contaService.listar();
+    @RolesAllowed({"gerente", "cliente"})
+    public List<ContaSemSaldoDTO> getContas(@QueryParam("cpf") String cpf) {
+        return contaService.listar(cpf);
     }
 
     @GET
@@ -34,8 +36,9 @@ public class ContaController {
 
     @POST
     @RolesAllowed({"gerente", "cliente"})
-    public Conta criarConta(ContaDTO conta) {
-        return contaService.criar(conta);
+    public Response criarConta(ContaDTO conta) {
+        contaService.criar(conta);
+        return Response.status(Response.Status.CREATED).build();
     }
 
     @DELETE

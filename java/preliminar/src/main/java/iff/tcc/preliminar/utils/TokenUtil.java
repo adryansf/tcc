@@ -1,11 +1,9 @@
 package iff.tcc.preliminar.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import iff.tcc.preliminar.entity.Cliente;
-import iff.tcc.preliminar.entity.Gerente;
+import iff.tcc.preliminar.entity.dto.JWTSubjectDTO;
 import iff.tcc.preliminar.entity.dto.UsuarioDTO;
 import iff.tcc.preliminar.exception.NaoAutorizadoException;
-import iff.tcc.preliminar.exception.NaoEncontradoException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -61,23 +59,18 @@ public class TokenUtil {
         String usuario = jwsClaims.getBody().getSubject();
         String cargo = jwsClaims.getBody().get("cargo", String.class);
 
+        if (!"cliente".equals(cargo) && !"gerente".equals(cargo)) {
+            throw new NaoAutorizadoException("Cargo inválido");
+        }
+
         try {
-            if ("cliente".equals(cargo)) {
-                return UsuarioDTO.builder()
-                        .cliente(true)
-                        .gerente(false)
-                        .usuario(objectMapper.readValue(usuario, Cliente.class))
-                        .build();
-            } else if ("gerente".equals(cargo)) {
-                return UsuarioDTO.builder()
-                        .cliente(false)
-                        .gerente(true)
-                        .usuario(objectMapper.readValue(usuario, Gerente.class))
-                        .build();
-            }
+            return UsuarioDTO.builder()
+                    .cliente("cliente".equals(cargo))
+                    .gerente("gerente".equals(cargo))
+                    .usuario(objectMapper.readValue(usuario, JWTSubjectDTO.class))
+                    .build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        throw new NaoAutorizadoException("Cargo inválido");
     }
 }

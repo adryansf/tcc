@@ -3,7 +3,6 @@ package iff.tcc.ajustado.service;
 import iff.tcc.ajustado.entity.Agencia;
 import iff.tcc.ajustado.exception.NaoEncontradoException;
 import iff.tcc.ajustado.repository.AgenciaRepository;
-import iff.tcc.ajustado.utils.TokenUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -28,10 +27,8 @@ public class AgenciaService {
     }
 
     @Transactional
-    public Agencia salvar(Agencia agencia) {
-        validarAgencia(agencia);
+    public void salvar(Agencia agencia) {
         agenciaRepository.persist(agencia);
-        return agencia;
     }
 
 

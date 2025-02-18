@@ -1,6 +1,5 @@
 package iff.tcc.ajustado.jwt;
 
-import iff.tcc.ajustado.exception.NaoAutorizadoException;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Priorities;

@@ -10,7 +10,7 @@ import java.util.UUID;
 @Builder
 public class TransacaoDTO {
     private long valor;
-    private UUID contaOrigemId;
-    private UUID contaDestinoId;
+    private UUID idContaOrigem;
+    private UUID idContaDestino;
     private TipoDeTransacao tipo;
 }

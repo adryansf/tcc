@@ -30,7 +30,7 @@ public class ClienteService {
     public Cliente buscarPorId(UUID id) {
         var usuario = tokenUtil.extrairUsuario();
 
-        if (usuario.isCliente() && !((Cliente) usuario.getUsuario()).getId().equals(id)) {
+        if (usuario.isCliente() && !usuario.getUsuario().getId().equals(id)) {
             throw new NaoPermitidoException("Usuário não tem permissão para realizar essa ação");
         }
 
@@ -38,15 +38,17 @@ public class ClienteService {
                 .orElseThrow(() -> new NaoEncontradoException("Cliente não encontrado"));
     }
 
+    public Cliente buscarPorCpf(String cpf) {
+        return clienteRepository.findByCpf(cpf);
+    }
+
     @Transactional
-    public Cliente criar(Cliente cliente) {
+    public void criar(Cliente cliente) {
         if (clienteRepository.existsByEmailOrCpf(cliente.getEmail(), cliente.getCpf())) {
             throw new RegistroInvalidoException("Já existe um cliente com esse email ou cpf");
         }
 
-        var novoCliente = RegistroUtils.formatarNovoCliente(cliente);
-        clienteRepository.persist(novoCliente);
-        return novoCliente;
+        clienteRepository.persist(RegistroUtils.formatarNovoCliente(cliente));
     }
 
     public Cliente update(UUID id, Cliente cliente) {
@@ -54,7 +56,7 @@ public class ClienteService {
 
         var usuario = tokenUtil.extrairUsuario();
 
-        if (usuario.isCliente() && !((Cliente) usuario.getUsuario()).getId().equals(id)) {
+        if (usuario.isCliente() && !usuario.getUsuario().getId().equals(id)) {
             throw new NaoPermitidoException("Usuário não tem permissão para realizar essa ação");
         }
 

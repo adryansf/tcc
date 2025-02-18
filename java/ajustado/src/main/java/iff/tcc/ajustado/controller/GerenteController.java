@@ -7,6 +7,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,8 +34,9 @@ public class GerenteController {
 
     @POST
     @RolesAllowed("gerente")
-    public Gerente criar(GerenteDTO gerente) {
-        return gerenteService.salvar(gerente);
+    public Response criar(GerenteDTO gerente) {
+        gerenteService.salvar(gerente);
+        return Response.status(Response.Status.CREATED).build();
     }
 
     @PUT

@@ -15,5 +15,4 @@ public interface ClienteRepository extends JpaRepository<Cliente, UUID> {
 
     boolean existsByEmailOrCpf(String email, String cpf);
 
-
 }

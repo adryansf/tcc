@@ -1,14 +1,15 @@
 package iff.tcc.preliminar.service;
 
-import iff.tcc.preliminar.entity.Cliente;
 import iff.tcc.preliminar.entity.Conta;
 import iff.tcc.preliminar.entity.dto.ContaDTO;
+import iff.tcc.preliminar.entity.dto.ContaSemSaldoProjection;
 import iff.tcc.preliminar.exception.NaoEncontradoException;
 import iff.tcc.preliminar.exception.NaoPermitidoException;
 import iff.tcc.preliminar.exception.RegistroInvalidoException;
 import iff.tcc.preliminar.repository.AgenciaRepository;
 import iff.tcc.preliminar.repository.ClienteRepository;
 import iff.tcc.preliminar.repository.ContaRepository;
+import iff.tcc.preliminar.repository.GerenteRepository;
 import iff.tcc.preliminar.utils.TokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,15 +25,13 @@ public class ContaService {
     private final AgenciaRepository agenciaRepository;
     private final ClienteRepository clienteRepository;
     private final TokenUtil tokenUtil;
+    private final GerenteRepository gerenteRepository;
 
-    public List<Conta> findAll() {
-        var usuario = tokenUtil.extrairUsuario();
+    public List<ContaSemSaldoProjection> findAll(String cpf) {
+        var cliente = clienteRepository.findByCpf(cpf)
+                .orElseThrow(() -> new NaoEncontradoException("Cliente não encontrado!"));
 
-        if (usuario.isCliente()) {
-            throw new NaoPermitidoException("Usuário não tem permissão para realizar essa ação");
-        }
-
-        return contaRepository.findAll();
+        return contaRepository.findAllByCliente(cliente);
     }
 
     public Conta findById(UUID id) {
@@ -41,7 +40,7 @@ public class ContaService {
 
         var usuario = tokenUtil.extrairUsuario();
 
-        if (usuario.isCliente() && !((Cliente) usuario.getUsuario()).getId().equals(conta.getCliente().getId())) {
+        if (usuario.isCliente() && !usuario.getUsuario().getId().equals(conta.getCliente().getId())) {
             throw new NaoPermitidoException("Usuário não tem permissão para realizar essa ação");
         }
 
@@ -51,8 +50,15 @@ public class ContaService {
     public Conta save(ContaDTO conta) {
         var usuario = tokenUtil.extrairUsuario();
 
-        if (usuario.isCliente() && !((Cliente) usuario.getUsuario()).getId().equals(conta.getClienteId())) {
-            throw new NaoPermitidoException("Usuário não tem permissão para realizar essa ação");
+        if (usuario.isCliente()) {
+            conta.setIdCliente(usuario.getUsuario().getId());
+        }
+
+        if (usuario.isGerente()) {
+            var gerente = gerenteRepository.findById(usuario.getUsuario().getId())
+                    .orElseThrow(() -> new NaoEncontradoException("Gerente não encontrado"));
+
+            conta.setIdAgencia(gerente.getAgencia().getId());
         }
 
         return contaRepository.save(criarConta(conta));
@@ -61,7 +67,7 @@ public class ContaService {
     public void delete(UUID id) {
         Conta conta = findById(id);
 
-        if(conta.getSaldo() != 0) {
+        if (conta.getSaldo() != 0) {
             throw new RegistroInvalidoException("A conta precisa ter saldo zerado para deletar!");
         }
 
@@ -70,12 +76,12 @@ public class ContaService {
 
     private Conta criarConta(ContaDTO novaConta) {
         var conta = new Conta();
-        conta.setAgencia(agenciaRepository.findById(novaConta.getAgenciaId())
+        conta.setAgencia(agenciaRepository.findById(novaConta.getIdAgencia())
                 .orElseThrow(() -> new NaoEncontradoException("Agência não encontrada!")));
-        conta.setCliente(clienteRepository.findById(novaConta.getClienteId())
+        conta.setCliente(clienteRepository.findById(novaConta.getIdCliente())
                 .orElseThrow(() -> new NaoEncontradoException("Cliente não encontrado!")));
+        conta.setNumero(null);
         conta.setSaldo(0);
-        conta.setNumero(novaConta.getNumero());
         conta.setTipo(novaConta.getTipo());
         return conta;
     }

@@ -4,6 +4,7 @@ import iff.tcc.preliminar.entity.Transacao;
 import iff.tcc.preliminar.entity.dto.TransacaoDTO;
 import iff.tcc.preliminar.service.TransacaoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +19,8 @@ public class TransacaoController {
     private final TransacaoService transacaoService;
 
     @GetMapping
-    public List<Transacao> getAllTransacoes() {
-        return transacaoService.findAll();
+    public List<Transacao> getAllTransacoes(@RequestParam(name = "idConta") UUID idConta) {
+        return transacaoService.findAllByConta(idConta);
     }
 
     @GetMapping("/{id}")
@@ -29,7 +30,8 @@ public class TransacaoController {
     }
 
     @PostMapping
-    public Transacao createTransacao(@RequestBody TransacaoDTO transacao) {
-        return transacaoService.save(transacao);
+    public ResponseEntity<Void> createTransacao(@RequestBody TransacaoDTO transacao) {
+        transacaoService.salvar(transacao);
+        return new ResponseEntity<Void>(HttpStatus.CREATED);
     }
 }

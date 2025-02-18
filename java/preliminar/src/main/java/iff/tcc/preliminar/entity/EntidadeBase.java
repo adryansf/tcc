@@ -1,6 +1,6 @@
 package iff.tcc.preliminar.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
@@ -15,8 +15,8 @@ public class EntidadeBase {
     @Id
     @UuidGenerator
     private UUID id;
-    @JsonIgnore
+    @Column(insertable = false)
     private LocalDateTime dataDeCriacao;
-    @JsonIgnore
+    @Column(insertable = false)
     private LocalDateTime dataDeAtualizacao;
 }

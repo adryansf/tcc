@@ -7,7 +7,6 @@ import iff.tcc.ajustado.entity.Cliente;
 import iff.tcc.ajustado.entity.Gerente;
 import iff.tcc.ajustado.entity.dto.GerenteDTO;
 import iff.tcc.ajustado.exception.RegistroInvalidoException;
-import jakarta.enterprise.context.ApplicationScoped;
 import org.apache.commons.lang3.StringUtils;
 import org.mindrot.jbcrypt.BCrypt;
 

@@ -1,5 +1,7 @@
 package iff.tcc.preliminar.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -17,6 +19,7 @@ public class Gerente extends EntidadeBase {
     private String telefone;
     private Date dataDeNascimento;
     private String email;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
     @JoinColumn(name = "idAgencia")
     @ManyToOne

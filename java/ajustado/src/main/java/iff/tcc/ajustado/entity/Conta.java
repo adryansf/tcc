@@ -1,19 +1,15 @@
 package iff.tcc.ajustado.entity;
 
 import iff.tcc.ajustado.entity.enums.TipoDeConta;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Table(name = "Conta")
 @Data
 public class Conta extends EntidadeBase {
-    private String numero;
+    @Column(insertable = false)
+    private Integer numero;
     private long saldo;
     @Enumerated(EnumType.STRING)
     private TipoDeConta tipo;

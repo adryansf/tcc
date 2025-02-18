@@ -1,12 +1,14 @@
 package iff.tcc.ajustado.controller;
 
 import iff.tcc.ajustado.entity.Transacao;
+import iff.tcc.ajustado.entity.dto.TransacaoContaSemSaldoDTO;
 import iff.tcc.ajustado.entity.dto.TransacaoDTO;
 import iff.tcc.ajustado.service.TransacaoService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,10 +22,11 @@ public class TransacaoController {
     TransacaoService transacaoService;
 
     @GET
-    @RolesAllowed("gerente")
-    public List<Transacao> getTransacoes() {
-        return transacaoService.listar();
+    @RolesAllowed({"gerente", "cliente"})
+    public List<TransacaoContaSemSaldoDTO> getTransacoes(@QueryParam("idConta") UUID idConta) {
+        return transacaoService.listar(idConta);
     }
+
 
     @GET
     @Path("/{id}")
@@ -34,7 +37,8 @@ public class TransacaoController {
 
     @POST
     @RolesAllowed({"cliente", "gerente"})
-    public Transacao criarTransacao(TransacaoDTO transacao) {
-        return transacaoService.salvar(transacao);
+    public Response criarTransacao(TransacaoDTO transacao) {
+        transacaoService.salvar(transacao);
+        return Response.status(Response.Status.CREATED).build();
     }
 }

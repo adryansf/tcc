@@ -3,6 +3,7 @@ package iff.tcc.preliminar.controller;
 import iff.tcc.preliminar.entity.Agencia;
 import iff.tcc.preliminar.service.AgenciaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,8 +29,9 @@ public class AgenciaController {
     }
 
     @PostMapping
-    public Agencia createAgencia(@RequestBody Agencia agencia) {
-        return agenciaService.save(agencia);
+    public ResponseEntity<Void> createAgencia(@RequestBody Agencia agencia) {
+        agenciaService.save(agencia);
+        return new ResponseEntity<Void>(HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

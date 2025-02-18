@@ -1,12 +1,13 @@
 package iff.tcc.preliminar.controller;
 
 import iff.tcc.preliminar.entity.Cliente;
+import iff.tcc.preliminar.entity.dto.ClienteComEnderecoDTO;
 import iff.tcc.preliminar.service.ClienteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -16,9 +17,9 @@ public class ClienteController {
 
     private final ClienteService clienteService;
 
-    @GetMapping
-    public List<Cliente> getAllClientes() {
-        return clienteService.findAll();
+    @GetMapping("/cpf/{cpf}")
+    public ClienteComEnderecoDTO getClienteByCpf(@PathVariable String cpf) {
+        return clienteService.findByCpf(cpf);
     }
 
     @GetMapping("/{id}")
@@ -28,8 +29,9 @@ public class ClienteController {
     }
 
     @PostMapping
-    public Cliente createCliente(@RequestBody Cliente cliente) {
-        return clienteService.save(cliente);
+    public ResponseEntity<Void> createCliente(@RequestBody Cliente cliente) {
+        clienteService.save(cliente);
+        return new ResponseEntity<Void>(HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

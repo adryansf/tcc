@@ -7,6 +7,7 @@ import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,8 +34,9 @@ public class EnderecoController {
 
     @POST
     @RolesAllowed({"gerente", "cliente"})
-    public Endereco criar(EnderecoDTO endereco) {
-        return enderecoService.criar(endereco);
+    public Response criar(EnderecoDTO endereco) {
+        enderecoService.criar(endereco);
+        return Response.status(Response.Status.CREATED).build();
     }
 
     @PUT

@@ -37,17 +37,15 @@ public class GerenteService {
     }
 
     @Transactional
-    public Gerente salvar(GerenteDTO gerente) {
+    public void salvar(GerenteDTO gerente) {
         if (gerenteRepository.existsByCpfOrEmail(gerente.getCpf(), gerente.getEmail())) {
             throw new RegistroInvalidoException("CPF ou email já cadastrado!");
         }
 
-        var agencia = agenciaRepository.findByIdOptional(gerente.getAgenciaId())
+        var agencia = agenciaRepository.findByIdOptional(gerente.getIdAgencia())
                 .orElseThrow(() -> new NaoEncontradoException("Agência não encontrada!"));
 
-        var gerenteEntity = RegistroUtils.formatarNovoGerente(gerente, agencia);
         gerenteRepository.persist(RegistroUtils.formatarNovoGerente(gerente, agencia));
-        return gerenteEntity;
     }
 
 
@@ -59,7 +57,7 @@ public class GerenteService {
             throw new RegistroInvalidoException("CPF ou email já cadastrado!");
         }
 
-        var agencia = agenciaRepository.findByIdOptional(gerente.getAgenciaId())
+        var agencia = agenciaRepository.findByIdOptional(gerente.getIdAgencia())
                 .orElseThrow(() -> new NaoEncontradoException("Agência não encontrada!"));
 
         RegistroUtils.formatarAtualizarGerente(gerenteEntity, gerente, agencia);

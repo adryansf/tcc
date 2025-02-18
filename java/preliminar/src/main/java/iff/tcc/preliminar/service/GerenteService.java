@@ -50,15 +50,15 @@ public class GerenteService {
             throw new RegistroInvalidoException("CPF ou email já cadastrado!");
         }
 
-        var agencia = getAgencia(gerente.getAgenciaId());
+        var agencia = getAgencia(gerente.getIdAgencia());
         return gerenteRepository.save(registroUtil.formatarNovoGerente(gerente, agencia));
     }
 
     public Gerente update(UUID id, GerenteDTO novoGerente) {
         var gerente = findById(id);
 
-        if (novoGerente.getAgenciaId() != gerente.getAgencia().getId()) {
-            var agencia = getAgencia(novoGerente.getAgenciaId());
+        if (novoGerente.getIdAgencia() != gerente.getAgencia().getId()) {
+            var agencia = getAgencia(novoGerente.getIdAgencia());
             return gerenteRepository.save(registroUtil.formatarAtualizarGerente(gerente, novoGerente, agencia));
         }
         return gerenteRepository.save(registroUtil.formatarAtualizarGerente(gerente, novoGerente, null));

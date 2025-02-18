@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class AuthTokenDTO {
-    private String message;
+    private long expiraEm;
     private String token;
+    private Object usuario;
 }

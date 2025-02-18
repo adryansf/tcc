@@ -1,10 +1,8 @@
 package iff.tcc.ajustado.service;
 
-import iff.tcc.ajustado.entity.Cliente;
 import iff.tcc.ajustado.entity.Endereco;
 import iff.tcc.ajustado.entity.dto.EnderecoDTO;
 import iff.tcc.ajustado.exception.NaoEncontradoException;
-import iff.tcc.ajustado.exception.NaoPermitidoException;
 import iff.tcc.ajustado.repository.ClienteRepository;
 import iff.tcc.ajustado.repository.EnderecoRepository;
 import iff.tcc.ajustado.utils.TokenUtil;
@@ -37,16 +35,10 @@ public class EnderecoService {
     }
 
     @Transactional
-    public Endereco criar(EnderecoDTO novoEndereco) {
+    public void criar(EnderecoDTO novoEndereco) {
         var usuario = tokenUtil.extrairUsuario();
 
-        if (usuario.isCliente() && !((Cliente) usuario.getUsuario()).getId().equals(novoEndereco.getClienteId())) {
-            throw new NaoPermitidoException("Usuário não tem permissão para realizar essa ação");
-        }
-
-        var endereco = formatarEndereco(novoEndereco);
-        enderecoRepository.persist(endereco);
-        return endereco;
+        enderecoRepository.persist(formatarEndereco(novoEndereco, usuario.getUsuario().getId()));
     }
 
     @Transactional
@@ -69,7 +61,7 @@ public class EnderecoService {
         enderecoRepository.delete(endereco);
     }
 
-    private Endereco formatarEndereco(EnderecoDTO novoEndereco) {
+    private Endereco formatarEndereco(EnderecoDTO novoEndereco, UUID clienteId) {
         var endereco = new Endereco();
         endereco.setLogradouro(novoEndereco.getLogradouro());
         endereco.setNumero(novoEndereco.getNumero());
@@ -78,7 +70,7 @@ public class EnderecoService {
         endereco.setCidade(novoEndereco.getCidade());
         endereco.setUf(novoEndereco.getUf());
         endereco.setCep(novoEndereco.getCep());
-        endereco.setCliente(clienteRepository.findByIdOptional(novoEndereco.getClienteId())
+        endereco.setCliente(clienteRepository.findByIdOptional(clienteId)
                 .orElseThrow(() -> new NaoEncontradoException("Cliente não encontrado")));
         return endereco;
     }

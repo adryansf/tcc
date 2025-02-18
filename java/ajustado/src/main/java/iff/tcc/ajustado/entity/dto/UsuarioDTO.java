@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class UsuarioDTO {
-    private Object usuario;
+    private JWTSubjectDTO usuario;
     private boolean gerente;
     private boolean cliente;
 }

@@ -1,4 +1,5 @@
 package iff.tcc.ajustado.repository;
+
 import iff.tcc.ajustado.entity.Cliente;
 import iff.tcc.ajustado.exception.NaoEncontradoException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;

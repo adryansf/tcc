@@ -4,6 +4,7 @@ import iff.tcc.preliminar.entity.Gerente;
 import iff.tcc.preliminar.entity.dto.GerenteDTO;
 import iff.tcc.preliminar.service.GerenteService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +30,9 @@ public class GerenteController {
     }
 
     @PostMapping
-    public Gerente createGerente(@RequestBody GerenteDTO gerente) {
-        return gerenteService.save(gerente);
+    public ResponseEntity<Void> createGerente(@RequestBody GerenteDTO gerente) {
+        gerenteService.save(gerente);
+        return new ResponseEntity<Void>(HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

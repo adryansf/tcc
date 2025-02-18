@@ -4,6 +4,7 @@ import iff.tcc.preliminar.entity.Endereco;
 import iff.tcc.preliminar.entity.dto.EnderecoDTO;
 import iff.tcc.preliminar.service.EnderecoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +30,9 @@ public class EnderecoController {
     }
 
     @PostMapping
-    public Endereco createEndereco(@RequestBody EnderecoDTO endereco) {
-        return enderecoService.save(endereco);
+    public ResponseEntity<Void> createEndereco(@RequestBody EnderecoDTO endereco) {
+        enderecoService.save(endereco);
+        return new ResponseEntity<Void>(HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")

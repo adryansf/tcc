@@ -1,8 +1,7 @@
 package iff.tcc.ajustado.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import iff.tcc.ajustado.entity.Cliente;
-import iff.tcc.ajustado.entity.Gerente;
+import iff.tcc.ajustado.entity.dto.JWTSubjectDTO;
 import iff.tcc.ajustado.entity.dto.UsuarioDTO;
 import iff.tcc.ajustado.exception.NaoAutorizadoException;
 import jakarta.enterprise.context.RequestScoped;
@@ -33,23 +32,18 @@ public class TokenUtil {
         validarToken();
         String cargo = getCargo();
 
+        if (!"cliente".equals(cargo) && !"gerente".equals(cargo)) {
+            throw new NaoAutorizadoException("Cargo inválido");
+        }
+
         try {
-            if ("cliente".equals(cargo)) {
-                return UsuarioDTO.builder()
-                        .cliente(true)
-                        .gerente(false)
-                        .usuario(objectMapper.readValue(jwt.getSubject(), Cliente.class))
-                        .build();
-            } else if ("gerente".equals(cargo)) {
-                return UsuarioDTO.builder()
-                        .cliente(false)
-                        .gerente(true)
-                        .usuario(objectMapper.readValue(jwt.getSubject(), Gerente.class))
-                        .build();
-            }
+            return UsuarioDTO.builder()
+                    .cliente("cliente".equals(cargo))
+                    .gerente("gerente".equals(cargo))
+                    .usuario(objectMapper.readValue(jwt.getSubject(), JWTSubjectDTO.class))
+                    .build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        throw new NaoAutorizadoException("Cargo inválido");
     }
 }

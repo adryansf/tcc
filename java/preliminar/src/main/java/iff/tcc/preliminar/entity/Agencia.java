@@ -10,5 +10,5 @@ import lombok.Data;
 public class Agencia extends EntidadeBase {
     private String nome;
     private String telefone;
-    private String numero;
+    private int numero;
 }

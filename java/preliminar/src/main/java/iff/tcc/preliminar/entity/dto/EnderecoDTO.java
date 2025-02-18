@@ -3,7 +3,7 @@ package iff.tcc.preliminar.entity.dto;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -15,5 +15,6 @@ public class EnderecoDTO {
     private String cidade;
     private String uf;
     private String cep;
-    private UUID clienteId;
+    private LocalDateTime dataDeCriacao;
+    private LocalDateTime dataDeAtualizacao;
 }
