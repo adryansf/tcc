@@ -61,10 +61,9 @@ CREATE TABLE "Conta" (
 CREATE TABLE "Transacao" (
   "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   "valor" decimal(15, 2) NOT NULL,
-  "data" timestamp DEFAULT CURRENT_TIMESTAMP,
   "tipo" varchar NOT NULL, -- Tipo será tratado no back-end
-  "idContaOrigem" UUID NOT NULL,
-  "idContaDestino" UUID NOT NULL,
+  "idContaOrigem" UUID NULL,
+  "idContaDestino" UUID NULL,
   "dataDeCriacao" timestamp DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -27,27 +27,32 @@ export class Router implements IRouter {
 
   constructor(prefix?: string) {
     this._router = ExpressRouter();
-    this._prefix = prefix ? `/${prefix}` : "";
+    this._prefix = prefix ? `/${prefix.replace(/^\/+/, "")}` : "";
+  }
+
+  private formatPath(path: string): string {
+    if (!path) return "";
+    return path.startsWith("/") ? path : `/${path}`;
   }
 
   get(path: string, ...renders: IRenderFunction[]) {
-    this._router.get(`${this._prefix}/${path}`, renders);
+    this._router.get(`${this._prefix}${this.formatPath(path)}`, renders);
   }
 
   post(path: string, ...renders: IRenderFunction[]) {
-    this._router.post(`${this._prefix}/${path}`, renders);
+    this._router.post(`${this._prefix}${this.formatPath(path)}`, renders);
   }
 
   put(path: string, ...renders: IRenderFunction[]) {
-    this._router.put(`${this._prefix}/${path}`, renders);
+    this._router.put(`${this._prefix}${this.formatPath(path)}`, renders);
   }
 
   patch(path: string, ...renders: IRenderFunction[]) {
-    this._router.patch(`${this._prefix}/${path}`, renders);
+    this._router.patch(`${this._prefix}${this.formatPath(path)}`, renders);
   }
 
   delete(path: string, ...renders: IRenderFunction[]) {
-    this._router.delete(`${this._prefix}/${path}`, renders);
+    this._router.delete(`${this._prefix}${this.formatPath(path)}`, renders);
   }
 
   get router() {

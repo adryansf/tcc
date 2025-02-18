@@ -13,9 +13,16 @@ export class BaseController {
     return res.status(error.statusCode).json(error.toJSON());
   }
 
+  protected sendSuccessWithoutBody(
+    res: Response,
+    status: number
+  ): ReturnRoute<void> {
+    return res.status(status).send();
+  }
+
   protected sendSuccessResponse<T extends Serializable>(
     res: Response,
-    data: T
+    data?: T
   ): ReturnRoute<T> {
     return res.status(200).json(data.toJSON());
   }

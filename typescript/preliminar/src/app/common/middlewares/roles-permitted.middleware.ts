@@ -10,7 +10,7 @@ import {
 import { RoleEnum } from "../enums/role.enum";
 
 export const rolesPermittedMiddleware = (...rolesPermitted: RoleEnum[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     if (!req?.auth) {
       const error = new UnauthorizedError();
       return res.status(error.statusCode).json(error.toJSON());

@@ -16,15 +16,21 @@ import { MESSAGES } from "@/app/common/messages";
 
 // Dtos
 import { CreateAccountDto } from "./dtos/inputs/create-account.dto";
-
+import { FindAllQueryAccountDto } from "./dtos/inputs/findAllQuery-account.dto";
 // Types
 import { Repositories } from "./accounts.module";
 import { RoleEnum } from "@/common/enums/role.enum";
+import { JwtPayload } from "../auth/interfaces/jwt-payload.interface";
 
 interface IAccountsService {
+  findAll: (
+    query: FindAllQueryAccountDto,
+    role: RoleEnum
+  ) => Promise<Either<BaseError, Partial<AccountEntity>[]>>;
   create: (
     data: CreateAccountDto,
-    idClient: string
+    idClient: string,
+    auth: JwtPayload
   ) => Promise<Either<BaseError, AccountEntity>>;
   findOne: (
     id: string,
@@ -36,10 +42,32 @@ interface IAccountsService {
 export class AccountsService implements IAccountsService {
   constructor(private _repositories: Repositories) {}
 
+  async findAll(
+    query: FindAllQueryAccountDto
+  ): Promise<Either<BaseError, Partial<AccountEntity>[]>> {
+    const accounts = await this._repositories.accounts.findAll({
+      cpf: query.cpf,
+    });
+
+    return right(accounts);
+  }
+
   async create(
     data: CreateAccountDto,
-    idClient: string
+    idClient: string,
+    { email, role }: JwtPayload
   ): Promise<Either<BaseError, AccountEntity>> {
+    if (role === RoleEnum.MANAGER) {
+      const manager = await this._repositories.managers.findByEmail(email);
+      data.idAgencia = manager.idAgencia;
+    }
+
+    if (!data.idAgencia) {
+      return left(
+        new BadRequestError(MESSAGES.error.account.BadRequest.BranchRequired)
+      );
+    }
+
     const branch = await this._repositories.branchs.findById(data.idAgencia);
 
     if (!branch) {
@@ -48,8 +76,25 @@ export class AccountsService implements IAccountsService {
       );
     }
 
+    if (role === RoleEnum.MANAGER) {
+      if (!data.idCliente) {
+        return left(
+          new BadRequestError(MESSAGES.error.account.BadRequest.IdClient)
+        );
+      }
+
+      var client = await this._repositories.clients.findById(data.idCliente);
+
+      if (!client) {
+        return left(new BadRequestError(MESSAGES.error.client.NotFound));
+      }
+
+      idClient = client.id;
+    }
+
     const newAccount = await this._repositories.accounts.create({
-      ...data,
+      idAgencia: data.idAgencia,
+      tipo: data.tipo,
       idCliente: idClient,
     });
 
