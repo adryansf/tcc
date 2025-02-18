@@ -19,72 +19,44 @@ export class Router implements IRouter {
 
   constructor(prefix?: string) {
     this._router = [];
-    this._prefix = prefix ? `/${prefix}` : "";
+    this._prefix = prefix ? `/${prefix.replace(/^\/+/, "")}` : "";
+  }
+
+  private formatPath(path: string): string {
+    if (!path) return "";
+    return path.startsWith("/") ? path : `/${path}`;
+  }
+
+  private addRoute(method: string, path: string, renders: IRenderFunction[]) {
+    const handler = renders.pop();
+    this._router.push({
+      method,
+      url: `${this._prefix}${this.formatPath(path)}`,
+      preHandler: renders,
+      handler: async (req, res) => {
+        await handler(req, res);
+      },
+    });
   }
 
   get(path: string, ...renders: IRenderFunction[]) {
-    const handler = renders.pop();
-
-    this._router.push({
-      method: "GET",
-      url: `${this._prefix}/${path}`,
-      preHandler: renders,
-      handler: async (req, res) => {
-        await handler(req, res);
-      },
-    });
+    this.addRoute("GET", path, renders);
   }
 
   post(path: string, ...renders: IRenderFunction[]) {
-    const handler = renders.pop();
-
-    this._router.push({
-      method: "POST",
-      url: `${this._prefix}/${path}`,
-      preHandler: renders,
-      handler: async (req, res) => {
-        await handler(req, res);
-      },
-    });
+    this.addRoute("POST", path, renders);
   }
 
   put(path: string, ...renders: IRenderFunction[]) {
-    const handler = renders.pop();
-
-    this._router.push({
-      method: "PUT",
-      url: `${this._prefix}/${path}`,
-      preHandler: renders,
-      handler: async (req, res) => {
-        await handler(req, res);
-      },
-    });
+    this.addRoute("PUT", path, renders);
   }
 
   patch(path: string, ...renders: IRenderFunction[]) {
-    const handler = renders.pop();
-
-    this._router.push({
-      method: "PATCH",
-      url: `${this._prefix}/${path}`,
-      preHandler: renders,
-      handler: async (req, res) => {
-        await handler(req, res);
-      },
-    });
+    this.addRoute("PATCH", path, renders);
   }
 
   delete(path: string, ...renders: IRenderFunction[]) {
-    const handler = renders.pop();
-
-    this._router.push({
-      method: "DELETE",
-      url: `${this._prefix}/${path}`,
-      preHandler: renders,
-      handler: async (req, res) => {
-        await handler(req, res);
-      },
-    });
+    this.addRoute("DELETE", path, renders);
   }
 
   get router() {

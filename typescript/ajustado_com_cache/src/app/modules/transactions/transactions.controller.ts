@@ -8,16 +8,13 @@ import {
 // Service
 import { TransactionsService } from "./transactions.service";
 
-// Entities
-import { TransactionEntity } from "./entities/transaction.entity";
-
 // CommonClasses
 import { BaseController } from "@/app/common/classes/base-controller.class";
 
 // Dtos
 import { CreateTransactionDto } from "./dtos/inputs/create-transaction.dto";
 import { FindAllTransactionsOutputDto } from "./dtos/outputs/findAll-transactions.dto";
-import { ParamsTransactionsDto } from "./dtos/inputs/params-transactions.dto";
+import { FindAllQueryTransactionsDto } from "./dtos/inputs/findAllQuery-transactions.dto";
 
 // Helpers
 import { validator } from "@/app/common/helpers/validator.helper";
@@ -33,7 +30,7 @@ export interface ITransactionsController {
   create: (
     req: Request,
     res: Response
-  ) => Promise<ReturnRoute<TransactionEntity | BaseError>>;
+  ) => Promise<ReturnRoute<void | BaseError>>;
   findAll: (
     req: Request,
     res: Response
@@ -49,9 +46,9 @@ export class TransactionsController
   }
 
   async findAll(req: Request, res: Response) {
-    const params = req.params as ParamsTransactionsDto;
+    const query = req.query as FindAllQueryTransactionsDto;
 
-    const validation = await validator(ParamsTransactionsDto, params);
+    const validation = await validator(FindAllQueryTransactionsDto, query);
 
     if (validation.isLeft()) {
       return this.sendErrorResponse(
@@ -61,7 +58,7 @@ export class TransactionsController
     }
 
     const result = await this._service.findAll(
-      params.idOriginAccount,
+      query.idConta,
       req.auth.id,
       req.auth.role
     );
@@ -79,24 +76,7 @@ export class TransactionsController
   }
 
   async create(req: Request, res: Response) {
-    const params = req.params as ParamsTransactionsDto;
     const body = req.body as CreateTransactionDto;
-
-    const validationParams = await validator(ParamsTransactionsDto, params);
-
-    if (validationParams.isLeft()) {
-      return this.sendErrorResponse(
-        res,
-        new BadRequestError(
-          MESSAGES.error.BadRequest,
-          validationParams?.value.errors
-        )
-      );
-    }
-
-    if (!body.idContaDestino) {
-      body.idContaDestino = params.idOriginAccount;
-    }
 
     const validationBody = await validator(CreateTransactionDto, body);
 
@@ -112,7 +92,6 @@ export class TransactionsController
 
     const result = await this._service.create(
       body as Required<CreateTransactionDto>,
-      params.idOriginAccount,
       req.auth.id
     );
 
@@ -120,8 +99,6 @@ export class TransactionsController
       return this.sendErrorResponse(res, result.value);
     }
 
-    const transaction = new TransactionEntity(result.value);
-
-    return this.sendSuccessResponse<TransactionEntity>(res, transaction);
+    return this.sendSuccessWithoutBody(res, 201);
   }
 }

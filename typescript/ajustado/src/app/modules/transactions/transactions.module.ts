@@ -28,12 +28,7 @@ export class TransactionsModule extends BaseModuleMultipleRepositories<
     const _service = new TransactionsService(_repositories);
     const _controller = new TransactionsController(_service);
 
-    super(
-      "contas/:idOriginAccount/transacoes",
-      _controller,
-      _service,
-      _repositories
-    );
+    super("transacoes", _controller, _service, _repositories);
   }
 
   routes() {

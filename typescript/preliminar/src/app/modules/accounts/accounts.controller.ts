@@ -17,6 +17,8 @@ import { BaseController } from "@/app/common/classes/base-controller.class";
 // Dtos
 import { CreateAccountDto } from "./dtos/inputs/create-account.dto";
 import { FindOneAccountDto } from "./dtos/inputs/findOne-account.dto";
+import { FindAllAccountsOutputDto } from "./dtos/outputs/findAll-accounts.dto";
+import { FindAllQueryAccountDto } from "./dtos/inputs/findAllQuery-account.dto";
 
 // Helpers
 import { validator } from "@/app/common/helpers/validator.helper";
@@ -29,10 +31,14 @@ import { BadRequestError } from "@/app/common/errors/bad-request.error";
 import { BaseError } from "@/app/common/errors/base.error";
 
 export interface IAccountsController {
+  findAll: (
+    req: Request,
+    res: Response
+  ) => Promise<ReturnRoute<FindAllAccountsOutputDto | BaseError>>;
   create: (
     req: Request,
     res: Response
-  ) => Promise<ReturnRoute<AccountEntity | BaseError>>;
+  ) => Promise<ReturnRoute<void | BaseError>>;
   findOne: (
     req: Request,
     res: Response
@@ -47,8 +53,31 @@ export class AccountsController
     super();
   }
 
+  async findAll(req: Request, res: Response) {
+    const query = req.query as FindAllQueryAccountDto;
+
+    const validation = await validator(FindAllQueryAccountDto, query);
+
+    if (validation.isLeft()) {
+      return this.sendErrorResponse(
+        res,
+        new BadRequestError(MESSAGES.error.BadRequest, validation?.value.errors)
+      );
+    }
+
+    const result = await this._service.findAll(query);
+
+    if (result.isLeft()) {
+      return this.sendErrorResponse(res, result.value);
+    }
+
+    const accounts = new FindAllAccountsOutputDto(result.value);
+
+    return this.sendSuccessResponse<FindAllAccountsOutputDto>(res, accounts);
+  }
+
   async findOne(req: Request, res: Response) {
-    const params = req.params;
+    const params = req.params as unknown as FindOneAccountDto;
 
     const validation = await validator(FindOneAccountDto, params);
 
@@ -86,14 +115,12 @@ export class AccountsController
       );
     }
 
-    const result = await this._service.create(body, req.auth.id);
+    const result = await this._service.create(body, req.auth.id, req.auth);
 
     if (result.isLeft()) {
       return this.sendErrorResponse(res, result.value);
     }
 
-    const account = new AccountEntity(result.value);
-
-    return this.sendSuccessResponse<AccountEntity>(res, account);
+    return this.sendSuccessWithoutBody(res, 201);
   }
 }

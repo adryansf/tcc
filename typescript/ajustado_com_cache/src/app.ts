@@ -27,7 +27,6 @@ export class App implements IApp {
   loadModules() {
     for (const module of modules) {
       const moduleInstance = new module();
-
       this._server.route(moduleInstance.router);
     }
   }

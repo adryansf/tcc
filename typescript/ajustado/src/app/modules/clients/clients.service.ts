@@ -21,6 +21,7 @@ import { MESSAGES } from "@/app/common/messages";
 
 interface IClientsService {
   findOne: (id: string) => Promise<Either<BaseError, Partial<ClientEntity>>>;
+  findByCPF: (cpf: string) => Promise<Either<BaseError, Partial<ClientEntity>>>;
   create: (
     data: ICreateClientData
   ) => Promise<Either<BaseError, Partial<ClientEntity>>>;
@@ -28,6 +29,18 @@ interface IClientsService {
 
 export class ClientsService implements IClientsService {
   constructor(private _repository: ClientsRepository) {}
+
+  async findByCPF(
+    cpf: string
+  ): Promise<Either<BaseError, Partial<ClientEntity>>> {
+    const client = await this._repository.findByCPF(cpf);
+
+    if (!client) {
+      return left(new NotFoundError(MESSAGES.error.client.NotFound));
+    }
+
+    return right(client);
+  }
 
   async findOne(id: string): Promise<Either<BaseError, Partial<ClientEntity>>> {
     const client = await this._repository.findById(id);

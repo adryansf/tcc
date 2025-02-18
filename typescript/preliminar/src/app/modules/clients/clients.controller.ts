@@ -17,6 +17,7 @@ import { BaseController } from "@/app/common/classes/base-controller.class";
 // Dtos
 import { FindOneClientDto } from "./dtos/inputs/findOne-client.dto";
 import { CreateClientDto } from "./dtos/inputs/create-client.dto";
+import { FindByCPFClientDto } from "./dtos/inputs/findByCPF-client.dto";
 
 // Helpers
 import { validator } from "@/app/common/helpers/validator.helper";
@@ -33,10 +34,14 @@ export interface IClientsController {
     req: Request,
     res: Response
   ) => Promise<ReturnRoute<ClientEntity | BaseError>>;
-  create: (
+  findByCPF: (
     req: Request,
     res: Response
   ) => Promise<ReturnRoute<ClientEntity | BaseError>>;
+  create: (
+    req: Request,
+    res: Response
+  ) => Promise<ReturnRoute<void | BaseError>>;
 }
 
 export class ClientsController
@@ -47,8 +52,31 @@ export class ClientsController
     super();
   }
 
+  async findByCPF(req: Request, res: Response) {
+    const params = req.params as unknown as FindByCPFClientDto;
+
+    const validation = await validator(FindByCPFClientDto, params);
+
+    if (validation.isLeft()) {
+      return this.sendErrorResponse(
+        res,
+        new BadRequestError(MESSAGES.error.BadRequest, validation?.value.errors)
+      );
+    }
+
+    const result = await this._service.findByCPF(params.cpf);
+
+    if (result.isLeft()) {
+      return this.sendErrorResponse(res, result.value);
+    }
+
+    const client = new ClientEntity(result.value);
+
+    return this.sendSuccessResponse<ClientEntity>(res, client);
+  }
+
   async findOne(req: Request, res: Response) {
-    const params = req.params;
+    const params = req.params as unknown as FindOneClientDto;
 
     const validation = await validator(FindOneClientDto, params);
 
@@ -88,8 +116,6 @@ export class ClientsController
       return this.sendErrorResponse(res, result.value);
     }
 
-    const client = new ClientEntity(result.value);
-
-    return this.sendSuccessResponse<ClientEntity>(res, client);
+    return this.sendSuccessWithoutBody(res, 201);
   }
 }

@@ -5,14 +5,17 @@ import { AccountsController } from "./accounts.controller";
 // Repositories
 import { AccountsRepository } from "./accounts.repository";
 import { BranchsRepository } from "../branchs/branchs.repository";
+import { ManagersRepository } from "../managers/managers.repository";
+import { ClientsRepository } from "../clients/clients.repository";
 
 // Middlewares
 import { authMiddleware } from "../auth/middlewares/auth.middleware";
 
-// Types
 export interface Repositories {
   accounts: AccountsRepository;
   branchs: BranchsRepository;
+  managers: ManagersRepository;
+  clients: ClientsRepository;
 }
 
 export class AccountsModule extends BaseModuleMultipleRepositories<
@@ -24,6 +27,8 @@ export class AccountsModule extends BaseModuleMultipleRepositories<
     const _repositories = {
       accounts: new AccountsRepository(),
       branchs: new BranchsRepository(),
+      managers: new ManagersRepository(),
+      clients: new ClientsRepository(),
     };
     const _service = new AccountsService(_repositories);
     const _controller = new AccountsController(_service);
@@ -32,6 +37,11 @@ export class AccountsModule extends BaseModuleMultipleRepositories<
   }
 
   routes() {
+    this._router.get(
+      "",
+      authMiddleware,
+      this._controller.findAll.bind(this._controller)
+    );
     this._router.get(
       ":id",
       authMiddleware,

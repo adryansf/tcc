@@ -13,15 +13,45 @@ export interface ICreateClientData {
   senha: string;
 }
 
+export interface IQueryFindAllClients {
+  cpf: string;
+}
+
 interface IClientsRepository {
   findById: (id: string) => Promise<Partial<ClientEntity> | undefined>;
+  findByCPF: (cpf: string) => Promise<Partial<ClientEntity> | undefined>;
+  findByEmail: (email: string) => Promise<Partial<ClientEntity> | undefined>;
   create: (data: ICreateClientData) => Promise<Partial<ClientEntity>>;
 }
 
 export class ClientsRepository implements IClientsRepository {
   async findById(id: string) {
     const result = await db.query(
-      `SELECT * FROM "Cliente" c WHERE c.id = $1 LIMIT 1`,
+      `SELECT c.nome AS nome,
+        c.telefone AS telefone,
+        c."dataDeNascimento" AS "dataDeNascimento",
+        c.email AS email,
+        c.senha AS senha,
+        c."dataDeCriacao" AS "dataDeCriacao",
+        c."dataDeAtualizacao" AS "dataDeAtualizacao",
+        CASE 
+          WHEN e.id IS NOT NULL THEN 
+            json_build_object(
+              'logradouro', e.logradouro,
+              'numero', e.numero,
+              'bairro', e.bairro,
+              'cidade', e.cidade,
+              'uf', e.uf,
+              'complemento', e.complemento,
+              'cep', e.cep,
+              'dataDeCriacao', e."dataDeCriacao",
+              'dataDeAtualizacao', e."dataDeAtualizacao"
+              ) 
+          ELSE NULL 
+        END AS endereco 
+      FROM "Cliente" c
+      LEFT JOIN "Endereco" e ON e."idCliente" = c.id
+      WHERE c.id = $1 LIMIT 1`,
       [id]
     );
 
@@ -30,7 +60,31 @@ export class ClientsRepository implements IClientsRepository {
 
   async findByEmail(email: string) {
     const result = await db.query(
-      `SELECT * FROM "Cliente" c WHERE c.email = $1 LIMIT 1`,
+      `SELECT c.nome AS nome,
+        c.telefone AS telefone,
+        c."dataDeNascimento" AS "dataDeNascimento",
+        c.email AS email,
+        c.senha AS senha,
+        c."dataDeCriacao" AS "dataDeCriacao",
+        c."dataDeAtualizacao" AS "dataDeAtualizacao",
+        CASE 
+          WHEN e.id IS NOT NULL THEN 
+            json_build_object(
+              'logradouro', e.logradouro,
+              'numero', e.numero,
+              'bairro', e.bairro,
+              'cidade', e.cidade,
+              'uf', e.uf,
+              'complemento', e.complemento,
+              'cep', e.cep,
+              'dataDeCriacao', e."dataDeCriacao",
+              'dataDeAtualizacao', e."dataDeAtualizacao"
+              ) 
+          ELSE NULL 
+        END AS endereco 
+      FROM "Cliente" c
+      LEFT JOIN "Endereco" e ON e."idCliente" = c.id
+      WHERE c.email = $1 LIMIT 1`,
       [email]
     );
 
@@ -39,7 +93,31 @@ export class ClientsRepository implements IClientsRepository {
 
   async findByCPF(cpf: string) {
     const result = await db.query(
-      `SELECT * FROM "Cliente" c WHERE c.cpf = $1 LIMIT 1`,
+      `SELECT c.nome AS nome,
+        c.telefone AS telefone,
+        c."dataDeNascimento" AS "dataDeNascimento",
+        c.email AS email,
+        c.senha AS senha,
+        c."dataDeCriacao" AS "dataDeCriacao",
+        c."dataDeAtualizacao" AS "dataDeAtualizacao",
+        CASE 
+          WHEN e.id IS NOT NULL THEN 
+            json_build_object(
+              'logradouro', e.logradouro,
+              'numero', e.numero,
+              'bairro', e.bairro,
+              'cidade', e.cidade,
+              'uf', e.uf,
+              'complemento', e.complemento,
+              'cep', e.cep,
+              'dataDeCriacao', e."dataDeCriacao",
+              'dataDeAtualizacao', e."dataDeAtualizacao"
+              ) 
+          ELSE NULL 
+        END AS endereco 
+      FROM "Cliente" c
+      LEFT JOIN "Endereco" e ON e."idCliente" = c.id
+      WHERE c.cpf = $1 LIMIT 1`,
       [cpf]
     );
 

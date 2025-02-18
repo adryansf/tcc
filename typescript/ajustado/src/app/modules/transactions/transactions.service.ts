@@ -9,6 +9,7 @@ import {
 
 // Entities
 import { TransactionEntity } from "./entities/transaction.entity";
+import { AccountEntity } from "../accounts/entities/account.entity";
 
 // Errors
 import { Either, left, right } from "@/app/common/errors/either";
@@ -32,7 +33,6 @@ import { TransactionTypeEnum } from "./enums/transaction-type.enum";
 interface ITransactionsService {
   create: (
     data: CreateTransactionDto,
-    idOriginAccount: string,
     idClient: string
   ) => Promise<Either<BaseError, TransactionEntity>>;
   findAll: (
@@ -47,34 +47,47 @@ export class TransactionsService implements ITransactionsService {
 
   async create(
     data: Required<CreateTransactionDto>,
-    idOriginAccount: string,
     idClient: string
   ): Promise<Either<BaseError, TransactionEntity>> {
+    const { tipo } = data;
+
+    let originAccount: AccountEntity | undefined = undefined;
+
+    if (data.idContaDestino === data.idContaOrigem) {
+      return left(
+        new BadRequestError(MESSAGES.error.account.BadRequest.SameAccount)
+      );
+    }
+
     // Verificar se contas existem
-    const originAccount = await this._repositories.accounts.findById(
-      idOriginAccount
-    );
+    if (data.idContaOrigem) {
+      originAccount = await this._repositories.accounts.findById(
+        data.idContaOrigem
+      );
 
-    if (!originAccount) {
-      return left(new NotFoundError(MESSAGES.error.account.NotFoundOrigin));
+      if (!originAccount) {
+        return left(new NotFoundError(MESSAGES.error.account.NotFoundOrigin));
+      }
+
+      if (originAccount.idCliente !== idClient) {
+        return left(new UnauthorizedError());
+      }
     }
 
-    if (originAccount.idCliente !== idClient) {
-      return left(new UnauthorizedError());
-    }
+    if (data.idContaDestino) {
+      const targetAccount = await this._repositories.accounts.findById(
+        data.idContaDestino
+      );
 
-    const targetAccount = await this._repositories.accounts.findById(
-      data.idContaDestino
-    );
-
-    if (!targetAccount) {
-      return left(new NotFoundError(MESSAGES.error.account.NotFoundTarget));
+      if (!targetAccount) {
+        return left(new NotFoundError(MESSAGES.error.account.NotFoundTarget));
+      }
     }
 
     // Verificar o saldo da conta
     if (
-      (data.tipo === TransactionTypeEnum.TRANSFER ||
-        data.tipo === TransactionTypeEnum.WITHDRAWAL) &&
+      (tipo === TransactionTypeEnum.TRANSFER ||
+        tipo === TransactionTypeEnum.WITHDRAWAL) &&
       originAccount.saldo < data.valor
     ) {
       return left(
@@ -86,10 +99,9 @@ export class TransactionsService implements ITransactionsService {
 
     const newTransaction = await this._repositories.transactions.create({
       ...data,
-      idContaOrigem: idOriginAccount,
     });
 
-    switch (data.tipo) {
+    switch (tipo) {
       case TransactionTypeEnum.DEPOSIT:
         await this._repositories.accounts.addBalance(
           data.idContaDestino,
@@ -98,18 +110,17 @@ export class TransactionsService implements ITransactionsService {
         break;
       case TransactionTypeEnum.TRANSFER:
         await this._repositories.accounts.removeBalance(
-          idOriginAccount,
+          data.idContaOrigem,
           data.valor
         );
         await this._repositories.accounts.addBalance(
           data.idContaDestino,
           data.valor
         );
-
         break;
       case TransactionTypeEnum.WITHDRAWAL:
         await this._repositories.accounts.removeBalance(
-          idOriginAccount,
+          data.idContaOrigem,
           data.valor
         );
         break;
@@ -125,13 +136,13 @@ export class TransactionsService implements ITransactionsService {
   }
 
   async findAll(
-    idOriginAccount: string,
+    idAccount: string,
     idClient: string,
     role: RoleEnum
   ): Promise<Either<BaseError, TransactionEntity[]>> {
     const permission = hasPermission(role, RoleEnum.MANAGER);
 
-    const account = await this._repositories.accounts.findById(idOriginAccount);
+    const account = await this._repositories.accounts.findById(idAccount);
 
     if (!account) {
       return left(new NotFoundError(MESSAGES.error.account.NotFound));
@@ -142,7 +153,7 @@ export class TransactionsService implements ITransactionsService {
     }
 
     const transactions = await this._repositories.transactions.findAll(
-      idOriginAccount
+      idAccount
     );
 
     return right(transactions);

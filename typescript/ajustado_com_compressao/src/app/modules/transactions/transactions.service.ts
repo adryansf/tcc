@@ -9,6 +9,7 @@ import {
 
 // Entities
 import { TransactionEntity } from "./entities/transaction.entity";
+import { AccountEntity } from "../accounts/entities/account.entity";
 
 // Errors
 import { Either, left, right } from "@/app/common/errors/either";
@@ -29,13 +30,9 @@ import { Repositories } from "./transactions.module";
 import { RoleEnum } from "@/common/enums/role.enum";
 import { TransactionTypeEnum } from "./enums/transaction-type.enum";
 
-// Cache
-import { CacheService } from "@/app/common/cache/cache.service";
-
 interface ITransactionsService {
   create: (
     data: CreateTransactionDto,
-    idOriginAccount: string,
     idClient: string
   ) => Promise<Either<BaseError, TransactionEntity>>;
   findAll: (
@@ -46,41 +43,51 @@ interface ITransactionsService {
 }
 
 export class TransactionsService implements ITransactionsService {
-  constructor(
-    private _repositories: Repositories,
-    private _cacheService: CacheService
-  ) {}
+  constructor(private _repositories: Repositories) {}
 
   async create(
     data: Required<CreateTransactionDto>,
-    idOriginAccount: string,
     idClient: string
   ): Promise<Either<BaseError, TransactionEntity>> {
+    const { tipo } = data;
+
+    let originAccount: AccountEntity | undefined = undefined;
+
+    if (data.idContaDestino === data.idContaOrigem) {
+      return left(
+        new BadRequestError(MESSAGES.error.account.BadRequest.SameAccount)
+      );
+    }
+
     // Verificar se contas existem
-    const originAccount = await this._repositories.accounts.findById(
-      idOriginAccount
-    );
+    if (data.idContaOrigem) {
+      originAccount = await this._repositories.accounts.findById(
+        data.idContaOrigem
+      );
 
-    if (!originAccount) {
-      return left(new NotFoundError(MESSAGES.error.account.NotFoundOrigin));
+      if (!originAccount) {
+        return left(new NotFoundError(MESSAGES.error.account.NotFoundOrigin));
+      }
+
+      if (originAccount.idCliente !== idClient) {
+        return left(new UnauthorizedError());
+      }
     }
 
-    if (originAccount.idCliente !== idClient) {
-      return left(new UnauthorizedError());
-    }
+    if (data.idContaDestino) {
+      const targetAccount = await this._repositories.accounts.findById(
+        data.idContaDestino
+      );
 
-    const targetAccount = await this._repositories.accounts.findById(
-      data.idContaDestino
-    );
-
-    if (!targetAccount) {
-      return left(new NotFoundError(MESSAGES.error.account.NotFoundTarget));
+      if (!targetAccount) {
+        return left(new NotFoundError(MESSAGES.error.account.NotFoundTarget));
+      }
     }
 
     // Verificar o saldo da conta
     if (
-      (data.tipo === TransactionTypeEnum.TRANSFER ||
-        data.tipo === TransactionTypeEnum.WITHDRAWAL) &&
+      (tipo === TransactionTypeEnum.TRANSFER ||
+        tipo === TransactionTypeEnum.WITHDRAWAL) &&
       originAccount.saldo < data.valor
     ) {
       return left(
@@ -92,10 +99,9 @@ export class TransactionsService implements ITransactionsService {
 
     const newTransaction = await this._repositories.transactions.create({
       ...data,
-      idContaOrigem: idOriginAccount,
     });
 
-    switch (data.tipo) {
+    switch (tipo) {
       case TransactionTypeEnum.DEPOSIT:
         await this._repositories.accounts.addBalance(
           data.idContaDestino,
@@ -104,19 +110,17 @@ export class TransactionsService implements ITransactionsService {
         break;
       case TransactionTypeEnum.TRANSFER:
         await this._repositories.accounts.removeBalance(
-          idOriginAccount,
+          data.idContaOrigem,
           data.valor
         );
         await this._repositories.accounts.addBalance(
           data.idContaDestino,
           data.valor
         );
-        // Reset cache para conta de destino
-        await this._cacheService.reset(`transactions:${data.idContaDestino}`);
         break;
       case TransactionTypeEnum.WITHDRAWAL:
         await this._repositories.accounts.removeBalance(
-          idOriginAccount,
+          data.idContaOrigem,
           data.valor
         );
         break;
@@ -128,29 +132,17 @@ export class TransactionsService implements ITransactionsService {
       return left(new InternalServerError());
     }
 
-    // Reset cache para conta de origem
-    await this._cacheService.reset(`transactions:${idOriginAccount}`);
-
     return right(newTransaction);
   }
 
   async findAll(
-    idOriginAccount: string,
+    idAccount: string,
     idClient: string,
     role: RoleEnum
   ): Promise<Either<BaseError, TransactionEntity[]>> {
-    // Cache
-    const cachedTransactions = await this._cacheService.get<
-      TransactionEntity[]
-    >(`transactions:${idOriginAccount}`);
-
-    if (cachedTransactions) {
-      return right(cachedTransactions);
-    }
-
     const permission = hasPermission(role, RoleEnum.MANAGER);
 
-    const account = await this._repositories.accounts.findById(idOriginAccount);
+    const account = await this._repositories.accounts.findById(idAccount);
 
     if (!account) {
       return left(new NotFoundError(MESSAGES.error.account.NotFound));
@@ -161,13 +153,7 @@ export class TransactionsService implements ITransactionsService {
     }
 
     const transactions = await this._repositories.transactions.findAll(
-      idOriginAccount
-    );
-
-    // Set cache
-    await this._cacheService.set(
-      `transactions:${idOriginAccount}`,
-      transactions
+      idAccount
     );
 
     return right(transactions);

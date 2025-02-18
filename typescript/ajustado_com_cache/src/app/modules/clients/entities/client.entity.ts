@@ -1,4 +1,5 @@
-import { Exclude, instanceToPlain } from "class-transformer";
+import { Exclude, instanceToPlain, Transform } from "class-transformer";
+import { AddressEntity } from "@/app/modules/addresses/entities/address.entity";
 
 export class ClientEntity {
   id: string;
@@ -13,6 +14,9 @@ export class ClientEntity {
 
   dataDeCriacao: Date;
   dataDeAtualizacao: Date;
+
+  @Transform(({ value }) => value && new AddressEntity(value))
+  endereco?: AddressEntity;
 
   constructor(partial: Partial<ClientEntity>) {
     Object.assign(this, partial);

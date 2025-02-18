@@ -19,40 +19,35 @@ import { NotFoundError } from "@/app/common/errors/not-found.error";
 // Messages
 import { MESSAGES } from "@/app/common/messages";
 
-// Cache
-import { CacheService } from "@/app/common/cache/cache.service";
-
 interface IClientsService {
   findOne: (id: string) => Promise<Either<BaseError, Partial<ClientEntity>>>;
+  findByCPF: (cpf: string) => Promise<Either<BaseError, Partial<ClientEntity>>>;
   create: (
     data: ICreateClientData
   ) => Promise<Either<BaseError, Partial<ClientEntity>>>;
 }
 
 export class ClientsService implements IClientsService {
-  constructor(
-    private _repository: ClientsRepository,
-    private _cacheService: CacheService
-  ) {}
+  constructor(private _repository: ClientsRepository) {}
 
-  async findOne(id: string): Promise<Either<BaseError, Partial<ClientEntity>>> {
-    // Cache
-    const cachedClient = await this._cacheService.get<Partial<ClientEntity>>(
-      `client:${id}`
-    );
-
-    if (cachedClient) {
-      return right(cachedClient);
-    }
-
-    const client = await this._repository.findById(id);
+  async findByCPF(
+    cpf: string
+  ): Promise<Either<BaseError, Partial<ClientEntity>>> {
+    const client = await this._repository.findByCPF(cpf);
 
     if (!client) {
       return left(new NotFoundError(MESSAGES.error.client.NotFound));
     }
 
-    // Set cache
-    await this._cacheService.set(`client:${id}`, client);
+    return right(client);
+  }
+
+  async findOne(id: string): Promise<Either<BaseError, Partial<ClientEntity>>> {
+    const client = await this._repository.findById(id);
+
+    if (!client) {
+      return left(new NotFoundError(MESSAGES.error.client.NotFound));
+    }
 
     return right(client);
   }

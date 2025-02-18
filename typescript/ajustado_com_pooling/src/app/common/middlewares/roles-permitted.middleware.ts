@@ -6,7 +6,7 @@ import { Request, Response } from "@/app/common/interfaces/http.interfaces";
 import { RoleEnum } from "../enums/role.enum";
 
 export const rolesPermittedMiddleware = (...rolesPermitted: RoleEnum[]) => {
-  return (req: Request, res: Response) => {
+  return async (req: Request, res: Response) => {
     if (!req?.auth) {
       const error = new UnauthorizedError();
       return res.code(error.statusCode).send(error.toJSON());

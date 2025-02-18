@@ -1,5 +1,4 @@
 import { FastifyRequest, FastifyReply } from "fastify";
-import { FastifyError } from "@fastify/error";
 import { JwtPayload } from "@/app/modules/auth/interfaces/jwt-payload.interface";
 
 export interface HttpResponseSuccess<Data> {

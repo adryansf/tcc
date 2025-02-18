@@ -9,7 +9,7 @@ export class AccountEntity {
   id: string;
   numero: number;
 
-  @Transform(({ value }) => Number(value))
+  @Transform(({ value }) => value && Number(value))
   saldo: number;
 
   tipo: AccountTypeEnum;

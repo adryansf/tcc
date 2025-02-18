@@ -15,6 +15,12 @@ export class BranchsRepository implements IBranchsRepository {
       [id]
     );
 
-    return result.rows[0] as Partial<BranchEntity> | undefined;
+    return result?.rows[0] as Partial<BranchEntity> | undefined;
+  }
+
+  async findAll() {
+    const result = await db.query(`SELECT * FROM "Agencia" a`);
+
+    return (result?.rows || []) as BranchEntity[];
   }
 }

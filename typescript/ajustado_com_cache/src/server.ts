@@ -1,6 +1,7 @@
 import Fastify, {
   FastifyInstance,
   FastifyPluginCallback,
+  FastifyRegisterOptions,
   RouteOptions,
 } from "fastify";
 
@@ -12,14 +13,19 @@ interface IServer {
 export class Server implements IServer {
   private _server: FastifyInstance;
   private _port: number;
+  private _host: string;
 
-  constructor(port: number) {
+  constructor(port: number, host: string = "localhost") {
     this._server = Fastify();
     this._port = port;
+    this._host = host;
   }
 
-  register(plugin: FastifyPluginCallback) {
-    this._server.register(plugin);
+  register<Options>(
+    plugin: FastifyPluginCallback,
+    options?: FastifyRegisterOptions<Options>
+  ) {
+    this._server.register(plugin, options);
   }
 
   route(router: RouteOptions[]) {
@@ -29,7 +35,7 @@ export class Server implements IServer {
   }
 
   start() {
-    this._server.listen({ port: this._port }, () => {
+    this._server.listen({ port: this._port, host: this._host }, () => {
       console.log(`Servidor rodando na porta ${this._port}`);
     });
   }

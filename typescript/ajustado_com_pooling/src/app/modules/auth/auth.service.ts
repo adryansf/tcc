@@ -50,12 +50,13 @@ export class AuthService implements IAuthService {
       email: client.email,
       id: client.id,
       role: RoleEnum.CLIENT,
+      cpf: client.cpf,
     });
 
     return right({
       token,
-      client,
-      expiresIn,
+      usuario: client,
+      expiraEm: expiresIn,
     });
   }
 
@@ -78,12 +79,13 @@ export class AuthService implements IAuthService {
       email: manager.email,
       id: manager.id,
       role: RoleEnum.MANAGER,
+      cpf: manager.cpf,
     });
 
     return right({
       token,
-      manager,
-      expiresIn,
+      usuario: manager,
+      expiraEm: expiresIn,
     });
   }
 }

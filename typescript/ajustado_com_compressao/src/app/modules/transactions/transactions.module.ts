@@ -9,9 +9,6 @@ import { TransactionsRepository } from "./transactions.repository";
 // Middlewares
 import { authMiddleware } from "../auth/middlewares/auth.middleware";
 
-// Cache
-import { CacheService } from "@/app/common/cache/cache.service";
-
 // Types
 export interface Repositories {
   accounts: AccountsRepository;
@@ -28,16 +25,10 @@ export class TransactionsModule extends BaseModuleMultipleRepositories<
       accounts: new AccountsRepository(),
       transactions: new TransactionsRepository(),
     };
-    const _cacheService = new CacheService();
-    const _service = new TransactionsService(_repositories, _cacheService);
+    const _service = new TransactionsService(_repositories);
     const _controller = new TransactionsController(_service);
 
-    super(
-      "contas/:idOriginAccount/transacoes",
-      _controller,
-      _service,
-      _repositories
-    );
+    super("transacoes", _controller, _service, _repositories);
   }
 
   routes() {

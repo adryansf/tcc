@@ -8,8 +8,13 @@ export const errorMessages = {
   },
   account: {
     BadRequest: {
+      BranchRequired: `Informe o ID da agência`,
       BranchNotExists: `A agência informada não existe.`,
       BalanceNotEnough: `Saldo insuficiente para realizar a transação.`,
+      IdClient: `O ID do cliente não foi informado.`,
+      Origin: `Conta de origem não informada.`,
+      Target: `Conta de destino não informada.`,
+      SameAccount: `A conta de origem não pode ser igual a conta de destino.`,
     },
     NotFound: "Conta não encontrada.",
     NotFoundOrigin: `Conta de origem não encontrada.`,
