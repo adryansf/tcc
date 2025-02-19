@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "ES6",
+      "module": "CommonJS",
+      "strict": true,
+      "outDir": "dist",
+      "rootDir": "./",
+      "esModuleInterop": true,
+      "allowImportingTsExtensions": true,
+      "noEmit": true
+    },
+    "include": ["**/*.ts", "scenarios/New-Client-Registering.ts", "index.ts"],
+    "exclude": ["dist"]
+}
+  
