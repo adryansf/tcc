@@ -1,23 +1,20 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { CriarClienteDTO, LoginPayload, CriarEnderecoDTO, CriarContaDTO } from '../entities/DTO/DTOS';
+import { Agencia } from '../entities/entities';
 
 
-export let options = {
-    vus: 1, // Número de usuários simultâneos
-    duration: '5s', // Tempo de execução do teste
-  };
-  
-  const BASE_URL = 'http://localhost:8080';
+
+const BASE_URL = 'http://localhost:8080';
 
 export default function () {
     // 1. Cadastrar cliente
     const cliente = {
         nome: "Matheuszao",
-        telefone: "22997012046",
-        cpf: "75192571855",
+        telefone: "22927012046",
+        cpf: "13003815741",
         dataDeNascimento: "2001-01-01",
-        email: "matheuszao@gmail.com",
+        email: "matheuszao2@gmail.com",
         senha: "12345678"
     } as CriarClienteDTO
     
@@ -41,17 +38,15 @@ export default function () {
     // 4. Buscar agências
     let agenciasRes = http.get(`${BASE_URL}/agencias`, authHeaders);
     check(agenciasRes, { 'Lista de agências obtida': (res) => res.status === 200 });
+    let agencias = agenciasRes.json() as unknown as Agencia[];
+    let agenciaId = agencias?.length > 0 ? agencias[0].id : null;
 
-    let agencias = agenciasRes.json();
-    console.log(agencias);
-   // let agenciaId = agencias?.length > 0 ? agencias[0].id : null;
-
-    // if (agenciaId) {
-    //     // 5. Criar conta
-    //     const contaPayload = {tipo: "POUPANCA", idCliente: } as CriarContaDTO;
-    //     let contaRes = http.post(`${BASE_URL}/contas`, JSON.stringify(contaPayload), authHeaders);
-    //     check(contaRes, { 'Conta criada': (res) => res.status === 201 });
-    // }
+    if (agenciaId) {
+        // 5. Criar conta
+        const contaPayload = {tipo: "POUPANCA", idAgencia: agenciaId} as CriarContaDTO;
+        let contaRes = http.post(`${BASE_URL}/contas`, JSON.stringify(contaPayload), authHeaders);
+        check(contaRes, { 'Conta criada': (res) => res.status === 201 });
+    }
 
     sleep(1); // Espera entre execuções para simular usuários reais
 }
