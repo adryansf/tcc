@@ -2,13 +2,8 @@ import { group, sleep } from "k6"
 import NewClientRegistering from "./scenarios/New-Client-Registering.ts"
 
 export let options = {
-    vus: 10,
-    duration: '30s',
-    ext: {
-      loadimpact: {
-        projectID: 123456,  // Se estiver usando LoadImpact (opcional)
-      },
-    },
+    vus: 1,
+    duration: '60s',
   };
   
 export default() => {

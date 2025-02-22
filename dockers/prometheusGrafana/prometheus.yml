@@ -1,0 +1,5 @@
+global:
+  scrape_interval: 5s  # Define o intervalo de coleta de métricas
+
+remote_write:
+  - url: "http://localhost:9090/api/v1/write"

@@ -15,11 +15,12 @@ export interface CriarClienteDTO {
 }
 
 import { TipoDeConta } from "../enum/TipoDeConta";
+import { TipoDeTransacao } from "../enum/TipoDeTransacao";
 
 export interface CriarContaDTO {
     tipo: TipoDeConta;
-    idAgencia: string;
-    idCliente: string;
+    idAgencia?: string;
+    idCliente?: string;
 }
 
 
@@ -36,4 +37,11 @@ export interface CriarEnderecoDTO {
 export interface LoginPayload {
     email: string;
     senha: string;
+}
+
+export interface TransacaoPayload {
+    valor: number;
+    contaDestinoId: string;
+    contaOrigemId: string;
+    tipoDeTransacao: TipoDeTransacao;
 }
