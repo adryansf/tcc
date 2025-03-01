@@ -102,7 +102,8 @@ export class TransactionsRepository implements ITransactionsRepository {
       LEFT JOIN "Conta" d ON t."idContaDestino" = d.id
       LEFT JOIN "Cliente" cli_d ON d."idCliente" = cli_d.id
       LEFT JOIN "Agencia" a_d ON d."idAgencia" = a_d.id
-      WHERE t."idContaOrigem" = $1 OR t."idContaDestino" = $2;
+      WHERE t."idContaOrigem" = $1 OR t."idContaDestino" = $2
+      ORDER BY t."dataDeCriacao" DESC;
       `,
       [idConta, idConta]
     );

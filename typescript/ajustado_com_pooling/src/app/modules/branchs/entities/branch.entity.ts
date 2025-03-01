@@ -3,7 +3,7 @@ import { instanceToPlain } from "class-transformer";
 export class BranchEntity {
   id: string;
   nome: string;
-  numero: string;
+  numero: number;
   telefone: string;
   dataDeCriacao: Date;
   dataDeAtualizacao: Date;
