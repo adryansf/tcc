@@ -27,7 +27,10 @@ interface IClientsRepository {
 export class ClientsRepository implements IClientsRepository {
   async findById(id: string) {
     const result = await db.query(
-      `SELECT c.nome AS nome,
+      `SELECT 
+        c.id, 
+        c.cpf as cpf,
+        c.nome AS nome,
         c.telefone AS telefone,
         c."dataDeNascimento" AS "dataDeNascimento",
         c.email AS email,
@@ -60,7 +63,10 @@ export class ClientsRepository implements IClientsRepository {
 
   async findByEmail(email: string) {
     const result = await db.query(
-      `SELECT c.nome AS nome,
+      `SELECT 
+        c.id, 
+        c.cpf as cpf,
+        c.nome AS nome,
         c.telefone AS telefone,
         c."dataDeNascimento" AS "dataDeNascimento",
         c.email AS email,
@@ -93,7 +99,10 @@ export class ClientsRepository implements IClientsRepository {
 
   async findByCPF(cpf: string) {
     const result = await db.query(
-      `SELECT c.nome AS nome,
+      `SELECT 
+        c.id, 
+        c.cpf as cpf,
+        c.nome AS nome,
         c.telefone AS telefone,
         c."dataDeNascimento" AS "dataDeNascimento",
         c.email AS email,
