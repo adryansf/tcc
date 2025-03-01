@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import Blueprint
+from flask_cors import CORS
 from waitress import serve
 
 
@@ -9,6 +10,9 @@ class Server:
         self._port = port
         self._debug=debug
         self._env = env
+        
+    def enable_cors(self):
+        CORS(self._server)
 
     def use(self, *handlers):
         for handler in handlers:

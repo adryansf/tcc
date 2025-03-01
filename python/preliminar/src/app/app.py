@@ -9,6 +9,7 @@ class App:
         self._server = server
 
     def middlewares(self):
+        self._server.enable_cors()
         register_error_handlers(self._server)
 
     def load_modules(self):
