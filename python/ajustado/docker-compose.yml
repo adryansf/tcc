@@ -1,0 +1,29 @@
+version: "3.8"
+
+name: tcc
+services:
+  app:
+    build: .
+    ports:
+      - "${SERVER_PORT}:3333"
+    networks:
+      - tcc_network
+    volumes:
+      - .:/app
+    command: python src/main.py
+    environment:
+      FLASK_ENV: production
+      DB_HOST: tcc_database
+      DB_PORT: 5432
+      DB_USER: tcc_user
+      DB_PASSWORD: tcc_password
+      DB_NAME: tcc_db
+      SERVER_PORT: 3333
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+    env_file:
+      - .env
+
+networks:
+  tcc_network:
+    driver: bridge
