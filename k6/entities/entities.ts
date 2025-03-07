@@ -29,6 +29,7 @@ export interface Cliente {
   telefone: string
   dataDeNascimento: string
   email: string
+  senha?: string
 }
 
 export interface Transacao {
@@ -37,4 +38,14 @@ export interface Transacao {
   contaOrigem: Conta
   contaDestino: Conta
   tipo: TipoDeTransacao
+}
+
+export interface Gerente {
+  nome: string;
+  cpf: string;
+  telefone: string;
+  dataDeNascimento: string;
+  email: string;
+  senha?: string;
+  agencia: Agencia;
 }

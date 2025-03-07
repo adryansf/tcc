@@ -5,10 +5,16 @@ import iff.tcc.ajustado.exception.NaoEncontradoException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
 public class ClienteRepository implements PanacheRepositoryBase<Cliente, UUID> {
+
+    public List<Cliente> listar(int quantidade) {
+        return findAll().range(0, quantidade-1).list();
+    }
+
     public Cliente findByCpf(String cpf) {
         return find("cpf", cpf).singleResultOptional()
                 .orElseThrow(() -> new NaoEncontradoException("Cliente não encontrado"));

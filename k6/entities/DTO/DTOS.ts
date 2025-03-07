@@ -41,7 +41,7 @@ export interface LoginPayload {
 
 export interface TransacaoPayload {
     valor: number;
-    contaDestinoId: string;
-    contaOrigemId: string;
-    tipoDeTransacao: TipoDeTransacao;
+    idContaDestino: string;
+    idContaOrigem: string;
+    tipo: TipoDeTransacao;
 }

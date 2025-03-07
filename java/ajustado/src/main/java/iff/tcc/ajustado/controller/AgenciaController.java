@@ -16,7 +16,7 @@ import java.util.UUID;
 @Consumes(MediaType.APPLICATION_JSON)
 public class AgenciaController {
     @Inject
-    private AgenciaService agenciaService;
+    AgenciaService agenciaService;
 
     @GET
     @RolesAllowed({"gerente", "cliente"})

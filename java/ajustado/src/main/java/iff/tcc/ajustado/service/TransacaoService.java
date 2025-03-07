@@ -51,10 +51,6 @@ public class TransacaoService {
 
     @Transactional
     public void salvar(TransacaoDTO transacao) {
-        if (transacao.getIdContaDestino() == transacao.getIdContaOrigem()) {
-            throw new RegistroInvalidoException("A conta de destino nao pode ser a mesma conta de origem");
-        }
-
         switch (transacao.getTipo()) {
             case SAQUE -> salvarSaque(transacao);
 
@@ -117,6 +113,10 @@ public class TransacaoService {
 
         if (transacao.getIdContaDestino() == null) {
             throw new RegistroInvalidoException("Conta de Destino é obrigatória");
+        }
+
+        if (transacao.getIdContaDestino().equals(transacao.getIdContaOrigem())) {
+            throw new RegistroInvalidoException("A conta de destino nao pode ser a mesma conta de origem");
         }
 
         var contaOrigem = contaRepository.findByIdOptional(transacao.getIdContaOrigem())

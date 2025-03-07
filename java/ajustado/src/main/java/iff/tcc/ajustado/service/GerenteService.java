@@ -31,6 +31,10 @@ public class GerenteService {
         return gerenteRepository.listAll();
     }
 
+    public List<Gerente> listar(int quantidade) {
+        return gerenteRepository.listar(quantidade);
+    }
+
     public Gerente buscarPorId(UUID id) {
         return gerenteRepository.findByIdOptional(id)
                 .orElseThrow(() -> new NaoEncontradoException("Gerente não encontrado!"));

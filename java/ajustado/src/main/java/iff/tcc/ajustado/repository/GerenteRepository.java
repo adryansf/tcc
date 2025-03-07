@@ -5,6 +5,7 @@ import iff.tcc.ajustado.exception.NaoEncontradoException;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 
+import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -21,5 +22,9 @@ public class GerenteRepository implements PanacheRepositoryBase<Gerente, UUID> {
 
     public boolean existsByCpfOrEmail(String cpf, String email) {
         return find("cpf", cpf).count() > 0 || find("email", email).count() > 0;
+    }
+
+    public List<Gerente> listar(int quantidade) {
+        return findAll().range(0, quantidade-1).list();
     }
 }

@@ -27,6 +27,10 @@ public class ClienteService {
         return clienteRepository.listAll();
     }
 
+    public List<Cliente> listar(int quantidade) {
+        return clienteRepository.listar(quantidade);
+    }
+
     public Cliente buscarPorId(UUID id) {
         var usuario = tokenUtil.extrairUsuario();
 

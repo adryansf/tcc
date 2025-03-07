@@ -1,8 +1,9 @@
 import { sleep } from 'k6';
 import { AcharPrimeiraAgencia, ClienteCriarPoupanca, CriarEndereco, LoginCliente, RegistrarCliente, } from '../BackendAdapter/BackendAdapter.ts';
 import { gerarClienteAleatorio, gerarEnderecoAleatorio } from '../FakerUtils/FakerUtils.ts';
+import { CriarClienteDTO } from '../entities/DTO/DTOS.ts';
 
-export default function () {
+export default function () : CriarClienteDTO{
     const cliente = gerarClienteAleatorio();
     
     RegistrarCliente(cliente)
@@ -11,5 +12,5 @@ export default function () {
     var agencia = AcharPrimeiraAgencia(authToken)
     ClienteCriarPoupanca(agencia.id, authToken)
 
-    sleep(1); // Espera entre execuções para simular usuários reais
+    return cliente;
 }
