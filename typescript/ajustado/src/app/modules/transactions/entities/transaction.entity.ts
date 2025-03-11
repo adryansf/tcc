@@ -26,6 +26,19 @@ export class TransactionEntity {
   }
 
   toJSON() {
-    return instanceToPlain(this);
+    const plainObject = instanceToPlain(this);
+    if (!plainObject.idContaOrigem) {
+      delete plainObject.idContaOrigem;
+    }
+    if (!plainObject.idContaDestino) {
+      delete plainObject.idContaDestino;
+    }
+    if (!plainObject?.contaOrigem) {
+      delete plainObject.contaOrigem;
+    }
+    if (!plainObject?.contaDestino) {
+      delete plainObject.contaDestino;
+    }
+    return plainObject;
   }
 }

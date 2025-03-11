@@ -123,6 +123,9 @@ export class AccountsService implements IAccountsService {
       return left(new UnauthorizedError());
     }
 
+    delete account.idCliente;
+    delete account.idAgencia;
+
     return right(account);
   }
 
