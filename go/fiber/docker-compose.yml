@@ -3,7 +3,7 @@ services:
   app:
     build: .
     ports:
-      - "${SERVER_PORT}:3333"
+      - "3333:3333"
     environment:
       ENV: production
       DB_HOST: tcc_database
@@ -12,12 +12,10 @@ services:
       DB_PASSWORD: tcc_password
       DB_NAME: tcc_db
       SERVER_PORT: 3333
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      JWT_SECRET: dcbacadf485c141a2b9b0028f2c0b2e1
+      JWT_EXPIRES_IN: 86400
       REDIS_URL: redis://redis_tcc:6379
     command: ["./main"]
-    env_file:
-      - .env
     networks:
       - tcc_network
 
