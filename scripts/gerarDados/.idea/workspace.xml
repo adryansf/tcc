@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5e75f0d9-d9ff-4788-8474-653b090585e3" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/.dockerignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/build.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/gradle.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/gradlew" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/gradlew.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/settings.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/docker/Dockerfile.jvm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/docker/Dockerfile.legacy-jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/docker/Dockerfile.native" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/docker/Dockerfile.native-micro" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/controller/AdminController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/controller/AgenciaController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/controller/AutenticacaoController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/controller/ClienteController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/controller/ContaController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/controller/EnderecoController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/controller/GerenteController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/controller/TransacaoController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/Agencia.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/Cliente.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/Conta.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/Endereco.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/EntidadeBase.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/Gerente.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/Transacao.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/dto/AuthTokenDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/dto/ClienteComEnderecoDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/dto/ContaDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/dto/ContaSemSaldoDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/dto/EnderecoDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/dto/ErrorDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/dto/GerenteDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/dto/JWTSubjectDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/dto/LoginDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/dto/TransacaoContaSemSaldoDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/dto/TransacaoDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/dto/UsuarioDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/enums/TipoDeConta.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/entity/enums/TipoDeTransacao.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/exception/EmailOuSenhaInvalidoException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/exception/NaoAutorizadoException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/exception/NaoEncontradoException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/exception/NaoPermitidoException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/exception/RegistroInvalidoException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/exception/mapper/EmailOuSenhaInvalidoExceptionMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/exception/mapper/NaoAutorizadoExceptionMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/exception/mapper/NaoEncontradoExceptionMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/exception/mapper/NaoPermitidoExceptionMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/exception/mapper/RegistroInvalidoExceptionMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/jwt/JwtFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/jwt/JwtGenerator.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/repository/AgenciaRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/repository/ClienteRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/repository/ContaRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/repository/EnderecoRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/repository/GerenteRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/repository/TransacaoRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/service/AgenciaService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/service/AutenticacaoService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/service/ClienteService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/service/ContaService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/service/EnderecoService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/service/GerenteService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/service/TransacaoService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/utils/RegistroUtils.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/java/iff/tcc/ajustado/utils/TokenUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/resources/db/migration/V1__init.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/resources/import.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/resources/privada.pem" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/resources/publica.pem" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/resources/resources/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/main/resources/resources/public.pem" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/native-test/java/iff/tcc/ajustado/GreetingResourceIT.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/ajustado/src/test/java/iff/tcc/ajustado/GreetingResourceTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/build.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/gradlew" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/gradlew.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/settings.gradle" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/PreliminarApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/config/GlobalExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/config/SecurityConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/controller/AgenciaController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/controller/AutenticacaoController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/controller/ClienteController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/controller/ContaController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/controller/EnderecoController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/controller/GerenteController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/controller/TransacaoController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/Agencia.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/Cliente.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/Conta.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/Endereco.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/EntidadeBase.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/Gerente.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/Transacao.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/dto/AuthTokenDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/dto/ClienteComEnderecoDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/dto/ContaDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/dto/ContaSemSaldoProjection.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/dto/EnderecoDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/dto/ErrorDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/dto/GerenteDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/dto/JWTSubjectDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/dto/LoginDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/dto/TransacaoDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/dto/UsuarioDTO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/enums/TipoDeConta.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/entity/enums/TipoDeTransacao.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/exception/EmailOuSenhaInvalidoException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/exception/NaoAutorizadoException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/exception/NaoEncontradoException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/exception/NaoPermitidoException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/exception/RegistroInvalidoException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/filters/AuthFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/jwt/JwtGeneratorImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/jwt/JwtGeneratorInterface.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/repository/AgenciaRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/repository/ClienteRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/repository/ContaRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/repository/EnderecoRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/repository/GerenteRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/repository/TransacaoRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/service/AgenciaService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/service/AutenticacaoService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/service/ClienteService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/service/ContaService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/service/EnderecoService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/service/GerenteService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/service/TransacaoService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/utils/RegistroUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/java/iff/tcc/preliminar/utils/TokenUtil.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/main/resources/db/migration/V1__init.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../java/preliminar/src/test/java/iff/tcc/preliminar/PreliminarApplicationTests.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2uHoUQeE7xlb5ZTFK6IyHurvDPf" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RdControllerToolWindowsLayoutState" isNewUi="true">
+    <layout>
+      <window_info id="Bookmarks" side_tool="true" />
+      <window_info id="Merge Requests" />
+      <window_info id="Commit_Guest" show_stripe_button="false" />
+      <window_info id="Pull Requests" />
+      <window_info id="Learn" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" />
+      <window_info id="Commit" order="1" weight="0.25" />
+      <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
+      <window_info id="Welcome to GitHub Copilot" order="3" />
+      <window_info anchor="bottom" id="Database Changes" />
+      <window_info anchor="bottom" id="TypeScript" />
+      <window_info anchor="bottom" id="TODO" />
+      <window_info anchor="bottom" id="HfCacheToolWindow" />
+      <window_info anchor="bottom" id="File Transfer" />
+      <window_info anchor="bottom" id="Version Control" order="0" />
+      <window_info anchor="bottom" id="Problems" order="1" />
+      <window_info anchor="bottom" id="Problems View" order="2" />
+      <window_info anchor="bottom" id="Terminal" order="3" weight="0.32977644" />
+      <window_info anchor="bottom" id="Services" order="4" />
+      <window_info anchor="bottom" id="Python Packages" order="5" weight="0.1" />
+      <window_info anchor="bottom" id="Python Console" order="6" weight="0.1" />
+      <window_info anchor="bottom" id="Find" order="7" weight="0.32977644" />
+      <window_info active="true" anchor="bottom" id="Run" order="8" visible="true" weight="0.32977644" />
+      <window_info anchor="right" id="Endpoints" />
+      <window_info anchor="right" id="Coverage" side_tool="true" />
+      <window_info anchor="right" id="SciView" />
+      <window_info anchor="right" content_ui="combo" id="Notifications" order="0" weight="0.25" />
+      <window_info anchor="right" id="AIAssistant" order="1" weight="0.25" />
+      <window_info anchor="right" id="Database" order="2" weight="0.25" />
+      <window_info anchor="right" id="Gradle" order="3" weight="0.25" />
+      <window_info anchor="right" id="Maven" order="4" weight="0.25" />
+      <window_info anchor="right" id="Plots" order="5" weight="0.1" />
+      <window_info anchor="right" id="github.copilotToolWindow" order="6" />
+      <window_info anchor="right" id="GitHub Copilot Chat" order="7" visible="true" weight="0.32984102" />
+    </layout>
+  </component>
+  <component name="RunManager">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <module name="gerarDados" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-d159365566ee-JavaScript-PY-251.23774.37" />
+        <option value="bundled-python-sdk-a606e5e558ee-f4058bf5e88f-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.23774.37" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5e75f0d9-d9ff-4788-8474-653b090585e3" name="Changes" comment="" />
+      <created>1741914876035</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1741914876035</updated>
+      <workItem from="1741914877471" duration="3775000" />
+      <workItem from="1741965565196" duration="5085000" />
+      <workItem from="1742072454336" duration="2234000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/main.py</url>
+          <line>154</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/gerarDados$main.coverage" NAME="main Coverage Results" MODIFIED="1742004096943" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>

@@ -1,0 +1,17 @@
+name: tcc
+services:
+  spring-app:
+    build: .
+    ports:
+      - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"  # Limita a 1.5 CPUs
+          memory: "2048M"  # Limita a 512MB de RAM
+    networks:
+      - tcc_network
+
+networks:
+  tcc_network:
+    driver: bridge
