@@ -11,6 +11,7 @@ export const generateJWT = (data: JwtPayload) => {
 
   const token = signJWT(data as Object, SECRET, {
     expiresIn,
+    algorithm: "HS256",
   });
 
   return { token, expiresIn };
