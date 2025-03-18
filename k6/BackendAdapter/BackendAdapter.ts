@@ -5,7 +5,7 @@ import { Agencia, Cliente, Conta, Gerente, Transacao } from '../entities/entitie
 import { TipoDeTransacao } from '../entities/enum/TipoDeTransacao.ts';
 
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = 'http://localhost:3333';
 
 
 export function RegistrarCliente(clientePayload: CriarClienteDTO): void {
