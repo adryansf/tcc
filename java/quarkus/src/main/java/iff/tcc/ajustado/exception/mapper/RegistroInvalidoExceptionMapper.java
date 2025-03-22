@@ -1,5 +1,6 @@
 package iff.tcc.ajustado.exception.mapper;
 
+import iff.tcc.ajustado.entity.dto.ExceptionDTO;
 import iff.tcc.ajustado.exception.RegistroInvalidoException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
@@ -10,6 +11,6 @@ public class RegistroInvalidoExceptionMapper implements ExceptionMapper<Registro
 
     @Override
     public Response toResponse(RegistroInvalidoException exception) {
-        return Response.status(Response.Status.BAD_REQUEST).entity(exception.getMessage()).build();
+        return Response.status(Response.Status.BAD_REQUEST).entity(ExceptionDTO.builder().message(exception.getMessage()).build()).build();
     }
 }

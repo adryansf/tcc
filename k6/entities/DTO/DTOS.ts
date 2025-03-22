@@ -4,6 +4,10 @@ export interface AuthTokenDTO {
     usuario: any;
 }
 
+export interface ErrorDTO{
+    message?: string;
+}
+
 
 export interface CriarClienteDTO {
     nome: string;

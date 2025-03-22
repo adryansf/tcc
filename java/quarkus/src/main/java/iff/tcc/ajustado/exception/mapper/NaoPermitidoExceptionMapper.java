@@ -1,5 +1,6 @@
 package iff.tcc.ajustado.exception.mapper;
 
+import iff.tcc.ajustado.entity.dto.ExceptionDTO;
 import iff.tcc.ajustado.exception.NaoPermitidoException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
@@ -10,6 +11,6 @@ public class NaoPermitidoExceptionMapper implements ExceptionMapper<NaoPermitido
 
     @Override
     public Response toResponse(NaoPermitidoException exception) {
-        return Response.status(Response.Status.FORBIDDEN).entity(exception.getMessage()).build();
+        return Response.status(Response.Status.FORBIDDEN).entity(ExceptionDTO.builder().message(exception.getMessage()).build()).build();
     }
 }

@@ -1,5 +1,5 @@
 \copy "Agencia"("id", "nome", "telefone", "numero", "dataDeCriacao", "dataDeAtualizacao")
-FROM '/caminho/destino/agencias.csv'
+FROM 'agencias.csv'
 DELIMITER ','
 CSV HEADER;
 

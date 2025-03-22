@@ -3,10 +3,13 @@ import { AcharPrimeiraAgencia, ClienteCriarPoupanca, CriarEndereco, LoginCliente
 import { gerarClienteAleatorio, gerarEnderecoAleatorio } from '../FakerUtils/FakerUtils.ts';
 import { CriarClienteDTO } from '../entities/DTO/DTOS.ts';
 
-export default function () : CriarClienteDTO{
+export default function () : CriarClienteDTO | null{
     const cliente = gerarClienteAleatorio();
     
-    RegistrarCliente(cliente)
+    if(!RegistrarCliente(cliente)) {
+        return null;
+    }
+    
     var authToken = LoginCliente({email: cliente.email, senha: cliente.senha}).token
     CriarEndereco(gerarEnderecoAleatorio(), authToken)
     var agencia = AcharPrimeiraAgencia(authToken)

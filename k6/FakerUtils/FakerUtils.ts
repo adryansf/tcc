@@ -13,6 +13,10 @@ export function gerarClienteAleatorio(): CriarClienteDTO {
     };
 }
 
+export function gerarCPFValido(): string {
+    return cpf.cpf(false);
+}
+
 export function gerarEnderecoAleatorio(): CriarEnderecoDTO {
     return {
         logradouro: faker.address.streetName(),
