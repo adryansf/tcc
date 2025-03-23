@@ -17,7 +17,6 @@ const scenarios = {
         executor: 'ramping-vus',
         startVUs: 100,
         stages:[
-<<<<<<< Updated upstream
             { duration: '90s', target: 100 }, // Mantém 100 VUs por 30s
             { duration: '0s', target: 200 },  // Sobe imediatamente para 200 VUs
             { duration: '90s', target: 200 }, // Mantém 200 VUs por 30s
@@ -25,15 +24,8 @@ const scenarios = {
             { duration: '90s', target: 300 }, // Mantém 300 VUs por 30s
             { duration: '0s', target: 400 },  // Sobe imediatamente para 400 VUs
             { duration: '90s', target: 400 }, // Mantém 400 VUs por 30s
-=======
-            { duration: '30s', target: 100 }, // Mantém 100 VUs por 30s
-            { duration: '0s', target: 200 },  // Sobe imediatamente para 200 VUs
-            { duration: '30s', target: 200 }, // Mantém 200 VUs por 30s
-            { duration: '0s', target: 300 },  // Sobe imediatamente para 300 VUs
-            { duration: '30s', target: 300 }, // Mantém 300 VUs por 30s
-            { duration: '0s', target: 400 },  // Sobe imediatamente para 400 VUs
-            { duration: '30s', target: 400 }, // Mantém 400 VUs por 30s
->>>>>>> Stashed changes
+            { duration: '0s', target: 500 },  // Sobe imediatamente para 500 VUs
+            { duration: '90s', target: 500 }, // Mantém 500 VUs por 30s
           ],
     },
     stress: {
@@ -87,7 +79,7 @@ export default({clientes, gerentes}: MainPayload) => {
         ClientDoingDeposit(cliente!, 1000);
         ClientDoingWithdraw(cliente!, 500);
         ClientVerifyingTransfers(cliente!);
-        ClientDoingTransfer(cliente!, randomItem(clientes).cpf, 100);
+        ClientDoingTransfer(cliente!, randomItem(clientes).cpf, 10);
     });
 
     group("Gerentes", () => {

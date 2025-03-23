@@ -11,17 +11,15 @@ const BASE_URL = 'http://localhost:3333';
 export function RegistrarCliente(clientePayload: CriarClienteDTO): boolean {
     let clienteRes = http.post(`${BASE_URL}/clientes`, JSON.stringify(clientePayload), { headers: { 'Content-Type': 'application/json' },  tags: { name: 'RegistrarCliente' }, }, );
 
+    check(clienteRes, { 'Cadastro de cliente bem-sucedido': (res) => res.status === 201 || res.status === 400 });
+
     if(clienteRes.status != 201) {
         var response = clienteRes.json() as unknown as ErrorDTO;
 
         if(response.message !== null) {
-            if(response.message!.includes("CPF")) {
-                return false;
-            }
+            return false;
         }
     }
-
-    check(clienteRes, { 'Cadastro de cliente bem-sucedido': (res) => res.status === 201 });
     return true;
 }
 
@@ -100,7 +98,7 @@ export function AcharContasPorCpf(cpf: string, authToken: string): Conta[] {
 }
 
 export function PostDeposito(contaId: string, valor: number, authToken: string): void {
-    const depositoPayload = { valor, idContaDestino: contaId, tipo: TipoDeTransacao.DEPOSITO, idContaOrigem: "" } as TransacaoPayload;
+    const depositoPayload = { valor, idContaDestino: contaId, tipo: TipoDeTransacao.DEPOSITO } as TransacaoPayload;
     var depositoRes = http.post(`${BASE_URL}/transacoes`, JSON.stringify(depositoPayload), authHeaders(authToken, 'PostDeposito'));
     check(depositoRes, { 'Depósito realizado': (res) => res.status === 201 });
     if(depositoRes.status !== 201) {
@@ -111,7 +109,7 @@ export function PostDeposito(contaId: string, valor: number, authToken: string):
 }
 
 export function PostSaque(contaId: string, valor: number, authToken: string): void {
-    const depositoPayload = { valor, idContaOrigem: contaId, tipo: TipoDeTransacao.SAQUE, idContaDestino: "" } as TransacaoPayload;
+    const depositoPayload = { valor, idContaOrigem: contaId, tipo: TipoDeTransacao.SAQUE } as TransacaoPayload;
     var depositoRes = http.post(`${BASE_URL}/transacoes`, JSON.stringify(depositoPayload), authHeaders(authToken, 'PostSaque'));
     check(depositoRes, { 'Saque realizado': (res) => res.status === 201 });
     if(depositoRes.status !== 201) {
