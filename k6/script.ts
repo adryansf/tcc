@@ -72,14 +72,15 @@ export function setup(): MainPayload {
 export default({clientes, gerentes}: MainPayload) => {
     group("Clientes", () => {
         var cliente = NewClientRegistering();
-        if(cliente == null) {
-            cliente = randomItem(clientes)
-        }
 
-        ClientDoingDeposit(cliente!, 1000);
-        ClientDoingWithdraw(cliente!, 500);
-        ClientVerifyingTransfers(cliente!);
-        ClientDoingTransfer(cliente!, randomItem(clientes).cpf, 10);
+        if(cliente !== null) {
+            var resultadoDeposito = ClientDoingDeposit(cliente!, 1000);
+            if(resultadoDeposito === false) {
+                ClientDoingWithdraw(cliente!, 500);
+                ClientVerifyingTransfers(cliente!);
+                ClientDoingTransfer(cliente!, randomItem(clientes).cpf, 10);
+            }
+        }
     });
 
     group("Gerentes", () => {
