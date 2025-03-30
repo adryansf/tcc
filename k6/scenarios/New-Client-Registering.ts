@@ -11,8 +11,18 @@ export default function () : CriarClienteDTO | null{
     }
     
     var authToken = LoginCliente({email: cliente.email, senha: cliente.senha}).token
+
+    if(authToken === null || authToken === undefined) {
+        return null; 
+    }
+
     CriarEndereco(gerarEnderecoAleatorio(), authToken)
     var agencia = AcharPrimeiraAgencia(authToken)
+    
+    if(agencia === null) {
+        return null; 
+    }
+
     
     if(ClienteCriarPoupanca(agencia.id, authToken)) return cliente 
     
