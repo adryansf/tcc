@@ -10,7 +10,7 @@ export default function () : CriarClienteDTO | null{
         return null;
     }
     
-    var authToken = LoginCliente({email: cliente.email, senha: cliente.senha}).token
+    var authToken = LoginCliente({email: cliente.email, senha: cliente.senha})?.token
 
     if(authToken === null || authToken === undefined) {
         return null; 
