@@ -21,6 +21,7 @@ import { FindAllQueryAccountDto } from "./dtos/inputs/findAllQuery-account.dto";
 import { Repositories } from "./accounts.module";
 import { RoleEnum } from "@/common/enums/role.enum";
 import { JwtPayload } from "../auth/interfaces/jwt-payload.interface";
+import { InternalServerError } from "@/app/common/errors/internal-server.error";
 
 interface IAccountsService {
   findAll: (
@@ -37,11 +38,6 @@ interface IAccountsService {
     idClient: string,
     role: RoleEnum
   ) => Promise<Either<BaseError, AccountEntity>>;
-  delete: (
-    id: string,
-    idClient: string,
-    role: RoleEnum
-  ) => Promise<Either<BaseError, null>>;
 }
 
 export class AccountsService implements IAccountsService {
@@ -103,6 +99,10 @@ export class AccountsService implements IAccountsService {
       idCliente: idClient,
     });
 
+    if (newAccount === null) {
+      return left(new InternalServerError(MESSAGES.error.InternalServer));
+    }
+
     return right(newAccount);
   }
 
@@ -127,27 +127,5 @@ export class AccountsService implements IAccountsService {
     delete account.idAgencia;
 
     return right(account);
-  }
-
-  async delete(
-    id: string,
-    idClient: string,
-    role: RoleEnum
-  ): Promise<Either<BaseError, null>> {
-    const permission = hasPermission(role, RoleEnum.MANAGER);
-
-    const account = await this._repositories.accounts.findById(id, true);
-
-    if (!account) {
-      return left(new NotFoundError(MESSAGES.error.account.NotFound));
-    }
-
-    if (account.idCliente !== idClient && !permission) {
-      return left(new UnauthorizedError());
-    }
-
-    await this._repositories.accounts.delete(id);
-
-    return right(null);
   }
 }

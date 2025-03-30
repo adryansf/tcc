@@ -21,13 +21,13 @@ interface IClientsRepository {
   findById: (id: string) => Promise<Partial<ClientEntity> | undefined>;
   findByCPF: (cpf: string) => Promise<Partial<ClientEntity> | undefined>;
   findByEmail: (email: string) => Promise<Partial<ClientEntity> | undefined>;
-  create: (data: ICreateClientData) => Promise<Partial<ClientEntity>>;
+  create: (data: ICreateClientData) => Promise<Partial<ClientEntity> | null>;
   findAll: (quantidade: number) => Promise<Partial<ClientEntity>[]>;
 }
 
 export class ClientsRepository implements IClientsRepository {
   async findById(id: string) {
-    const result = await db.query(
+    const result = await db.raw(
       `SELECT 
         c.id, 
         c.cpf as cpf,
@@ -55,15 +55,14 @@ export class ClientsRepository implements IClientsRepository {
         END AS endereco 
       FROM "Cliente" c
       LEFT JOIN "Endereco" e ON e."idCliente" = c.id
-      WHERE c.id = $1 LIMIT 1`,
+      WHERE c.id = ? LIMIT 1`,
       [id]
     );
-
     return result.rows[0] as Partial<ClientEntity> | undefined;
   }
 
   async findByEmail(email: string) {
-    const result = await db.query(
+    const result = await db.raw(
       `SELECT 
         c.id, 
         c.cpf as cpf,
@@ -91,15 +90,14 @@ export class ClientsRepository implements IClientsRepository {
         END AS endereco 
       FROM "Cliente" c
       LEFT JOIN "Endereco" e ON e."idCliente" = c.id
-      WHERE c.email = $1 LIMIT 1`,
+      WHERE c.email = ? LIMIT 1`,
       [email]
     );
-
     return result.rows[0] as Partial<ClientEntity> | undefined;
   }
 
   async findByCPF(cpf: string) {
-    const result = await db.query(
+    const result = await db.raw(
       `SELECT 
         c.id, 
         c.cpf as cpf,
@@ -127,31 +125,36 @@ export class ClientsRepository implements IClientsRepository {
         END AS endereco 
       FROM "Cliente" c
       LEFT JOIN "Endereco" e ON e."idCliente" = c.id
-      WHERE c.cpf = $1 LIMIT 1`,
+      WHERE c.cpf = ? LIMIT 1`,
       [cpf]
     );
-
     return result.rows[0] as Partial<ClientEntity> | undefined;
   }
 
   async create(data: ICreateClientData) {
-    const result = await db.query(
-      `INSERT INTO "Cliente" (nome, cpf, telefone, "dataDeNascimento", email, senha) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [
-        data.nome,
-        data.cpf,
-        data.telefone,
-        data.dataDeNascimento,
-        data.email,
-        data.senha,
-      ]
-    );
-
-    return result.rows[0] as Partial<ClientEntity> | undefined;
+    const trx = await db.transaction();
+    try {
+      const result = await trx.raw(
+        `INSERT INTO "Cliente" (nome, cpf, telefone, "dataDeNascimento", email, senha) VALUES (?, ?, ?, ?, ?, ?) RETURNING *`,
+        [
+          data.nome,
+          data.cpf,
+          data.telefone,
+          data.dataDeNascimento,
+          data.email,
+          data.senha,
+        ]
+      );
+      await trx.commit();
+      return result.rows[0] as Partial<ClientEntity> | undefined;
+    } catch (error) {
+      await trx.rollback();
+      return null;
+    }
   }
 
   async findAll(quantidade: number) {
-    const result = await db.query(
+    const result = await db.raw(
       `SELECT 
         c.id, 
         c.cpf as cpf,
@@ -163,10 +166,9 @@ export class ClientsRepository implements IClientsRepository {
         c."dataDeCriacao" AS "dataDeCriacao",
         c."dataDeAtualizacao" AS "dataDeAtualizacao"
       FROM "Cliente" c
-      LIMIT $1`,
+      LIMIT ?`,
       [quantidade]
     );
-
-    return (result?.rows || []) as Partial<ClientEntity>[];
+    return result.rows as Partial<ClientEntity>[];
   }
 }

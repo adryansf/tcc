@@ -10,17 +10,15 @@ interface IBranchsRepository {
 
 export class BranchsRepository implements IBranchsRepository {
   async findById(id: string) {
-    const result = await db.query(
-      `SELECT * FROM "Agencia" a WHERE a.id = $1 LIMIT 1`,
+    const result = await db.raw(
+      `SELECT * FROM "Agencia" a WHERE a.id = ? LIMIT 1`,
       [id]
     );
-
-    return result?.rows[0] as Partial<BranchEntity> | undefined;
+    return result.rows[0] as Partial<BranchEntity> | undefined;
   }
 
   async findAll() {
-    const result = await db.query(`SELECT * FROM "Agencia" a`);
-
-    return (result?.rows || []) as BranchEntity[];
+    const result = await db.raw(`SELECT * FROM "Agencia" a`);
+    return result.rows as BranchEntity[];
   }
 }

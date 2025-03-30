@@ -2,10 +2,7 @@
 import { hasPermission } from "@/app/common/helpers/permission.helper";
 
 // Database
-import {
-  endDatabaseTransaction,
-  startDatabaseTransaction,
-} from "@/database/transactions";
+import { db } from "@/database";
 
 // Entities
 import { TransactionEntity } from "./entities/transaction.entity";
@@ -95,44 +92,51 @@ export class TransactionsService implements ITransactionsService {
       );
     }
 
-    await startDatabaseTransaction();
+    const trx = await db.transaction();
+    try {
+      // Alterar os saldos das contas
+      switch (tipo) {
+        case TransactionTypeEnum.DEPOSIT:
+          await this._repositories.accounts.addBalance(
+            data.idContaDestino,
+            data.valor,
+            trx
+          );
+          break;
+        case TransactionTypeEnum.TRANSFER:
+          await this._repositories.accounts.removeBalance(
+            data.idContaOrigem,
+            data.valor,
+            trx
+          );
+          await this._repositories.accounts.addBalance(
+            data.idContaDestino,
+            data.valor,
+            trx
+          );
+          break;
+        case TransactionTypeEnum.WITHDRAWAL:
+          await this._repositories.accounts.removeBalance(
+            data.idContaOrigem,
+            data.valor,
+            trx
+          );
+          break;
+      }
 
-    const newTransaction = await this._repositories.transactions.create({
-      ...data,
-    });
+      // Criar a transação
+      const newTransaction = await this._repositories.transactions.create(
+        data,
+        trx
+      );
 
-    switch (tipo) {
-      case TransactionTypeEnum.DEPOSIT:
-        await this._repositories.accounts.addBalance(
-          data.idContaDestino,
-          data.valor
-        );
-        break;
-      case TransactionTypeEnum.TRANSFER:
-        await this._repositories.accounts.removeBalance(
-          data.idContaOrigem,
-          data.valor
-        );
-        await this._repositories.accounts.addBalance(
-          data.idContaDestino,
-          data.valor
-        );
-        break;
-      case TransactionTypeEnum.WITHDRAWAL:
-        await this._repositories.accounts.removeBalance(
-          data.idContaOrigem,
-          data.valor
-        );
-        break;
-    }
+      await trx.commit();
 
-    const transactionSuccess = await endDatabaseTransaction();
-
-    if (!transactionSuccess) {
+      return right(newTransaction);
+    } catch (error) {
+      await trx.rollback();
       return left(new InternalServerError());
     }
-
-    return right(newTransaction);
   }
 
   async findAll(

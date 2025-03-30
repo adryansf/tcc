@@ -2,6 +2,7 @@ import { BaseModule } from "@/app/common/classes/base-module.class";
 import { ClientsService } from "./clients.service";
 import { ClientsController } from "./clients.controller";
 import { ClientsRepository } from "./clients.repository";
+import { CacheService } from "@/app/common/cache/cache.service";
 
 // Middlewares
 import { authMiddleware } from "../auth/middlewares/auth.middleware";
@@ -16,8 +17,9 @@ export class ClientsModule extends BaseModule<
   ClientsRepository
 > {
   constructor() {
+    const cacheService = new CacheService();
     const _repository = new ClientsRepository();
-    const _service = new ClientsService(_repository);
+    const _service = new ClientsService(_repository, cacheService);
     const _controller = new ClientsController(_service);
 
     super("clientes", _controller, _service, _repository);

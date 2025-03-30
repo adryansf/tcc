@@ -21,6 +21,7 @@ import { FindAllQueryAccountDto } from "./dtos/inputs/findAllQuery-account.dto";
 import { Repositories } from "./accounts.module";
 import { RoleEnum } from "@/common/enums/role.enum";
 import { JwtPayload } from "../auth/interfaces/jwt-payload.interface";
+import { InternalServerError } from "@/app/common/errors/internal-server.error";
 
 interface IAccountsService {
   findAll: (
@@ -97,6 +98,10 @@ export class AccountsService implements IAccountsService {
       tipo: data.tipo,
       idCliente: idClient,
     });
+
+    if (newAccount === null) {
+      return left(new InternalServerError(MESSAGES.error.InternalServer));
+    }
 
     return right(newAccount);
   }

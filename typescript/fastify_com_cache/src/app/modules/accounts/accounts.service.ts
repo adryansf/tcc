@@ -22,6 +22,7 @@ import { Repositories } from "./accounts.module";
 import { RoleEnum } from "@/common/enums/role.enum";
 import { CacheService } from "@/app/common/cache/cache.service";
 import { JwtPayload } from "jsonwebtoken";
+import { InternalServerError } from "@/app/common/errors/internal-server.error";
 
 interface IAccountsService {
   findAll: (
@@ -113,6 +114,10 @@ export class AccountsService implements IAccountsService {
       tipo: data.tipo,
       idCliente: idClient,
     });
+
+    if (newAccount === null) {
+      return left(new InternalServerError(MESSAGES.error.InternalServer));
+    }
 
     await this._cacheService.reset(`accounts:all:${cpf}`);
 

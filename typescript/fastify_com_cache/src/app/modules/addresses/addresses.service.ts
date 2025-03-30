@@ -15,6 +15,7 @@ import { CreateAddressDto } from "./dtos/inputs/create-address.dto";
 // Types
 import { Repositories } from "./addresses.module";
 import { CacheService } from "@/app/common/cache/cache.service";
+import { InternalServerError } from "@/app/common/errors/internal-server.error";
 
 interface IAddressesService {
   create: (
@@ -54,6 +55,10 @@ export class AddressesService implements IAddressesService {
       ...data,
       idCliente: idClient,
     });
+
+    if (newAddress === null) {
+      return left(new InternalServerError(MESSAGES.error.InternalServer));
+    }
 
     await this._cacheService.reset(`client:id:${client.id}`);
     await this._cacheService.reset(`client:cpf:${client.cpf}`);

@@ -14,6 +14,7 @@ import { CreateAddressDto } from "./dtos/inputs/create-address.dto";
 
 // Types
 import { Repositories } from "./addresses.module";
+import { InternalServerError } from "@/app/common/errors/internal-server.error";
 
 interface IAddressesService {
   create: (
@@ -50,6 +51,10 @@ export class AddressesService implements IAddressesService {
       ...data,
       idCliente: idClient,
     });
+
+    if (newAddress === null) {
+      return left(new InternalServerError(MESSAGES.error.InternalServer));
+    }
 
     return right(newAddress);
   }

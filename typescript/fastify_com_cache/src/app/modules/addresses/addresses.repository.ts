@@ -16,34 +16,40 @@ export interface ICreateAddressData {
 }
 
 interface IAddressesRepository {
-  create: (data: ICreateAddressData) => Promise<AddressEntity | undefined>;
+  create: (data: ICreateAddressData) => Promise<AddressEntity | null>;
   findByIdClient: (idClient: string) => Promise<AddressEntity | undefined>;
 }
 
 export class AddressesRepository implements IAddressesRepository {
   async create(data: ICreateAddressData) {
-    const result = await db.query(
-      `INSERT INTO "Endereco" (logradouro, numero, bairro, cidade, uf, cep, "idCliente", complemento) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-      [
-        data.logradouro,
-        data.numero,
-        data.bairro,
-        data.cidade,
-        data.uf,
-        data.cep,
-        data.idCliente,
-        data.complemento,
-      ]
-    );
-    return result?.rows[0] as AddressEntity | undefined;
+    const trx = await db.transaction();
+    try {
+      const result = await trx.raw(
+        `INSERT INTO "Endereco" (logradouro, numero, bairro, cidade, uf, cep, "idCliente", complemento) VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`,
+        [
+          data.logradouro,
+          data.numero,
+          data.bairro,
+          data.cidade,
+          data.uf,
+          data.cep,
+          data.idCliente,
+          data.complemento,
+        ]
+      );
+      await trx.commit();
+      return result.rows[0] as AddressEntity | undefined;
+    } catch (error) {
+      await trx.rollback();
+      return null;
+    }
   }
 
   async findByIdClient(idClient: string) {
-    const result = await db.query(
-      `SELECT * FROM "Endereco" e WHERE e."idCliente" = $1`,
+    const result = await db.raw(
+      `SELECT * FROM "Endereco" e WHERE e."idCliente" = ?`,
       [idClient]
     );
-
-    return result?.rows[0] as AddressEntity | undefined;
+    return result.rows[0] as AddressEntity | undefined;
   }
 }

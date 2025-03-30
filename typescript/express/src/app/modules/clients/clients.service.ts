@@ -18,6 +18,7 @@ import { NotFoundError } from "@/app/common/errors/not-found.error";
 
 // Messages
 import { MESSAGES } from "@/app/common/messages";
+import { InternalServerError } from "@/app/common/errors/internal-server.error";
 
 interface IClientsService {
   findOne: (id: string) => Promise<Either<BaseError, Partial<ClientEntity>>>;
@@ -74,6 +75,10 @@ export class ClientsService implements IClientsService {
     const senha = await encryptPassword(data.senha);
 
     const client = await this._repository.create({ ...data, senha });
+
+    if (client === null) {
+      return left(new InternalServerError(MESSAGES.error.InternalServer));
+    }
 
     return right(client);
   }

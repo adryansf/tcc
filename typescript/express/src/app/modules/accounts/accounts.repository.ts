@@ -1,3 +1,5 @@
+import { Knex } from "knex";
+
 // Database
 import { db } from "@/database";
 
@@ -16,24 +18,39 @@ export interface IQueryFindAllAccounts {
 }
 
 interface IAccountsRepository {
-  create: (data: ICreateAccountData) => Promise<AccountEntity | undefined>;
+  create: (data: ICreateAccountData) => Promise<AccountEntity | null>;
   findById: (id: string) => Promise<AccountEntity | undefined>;
-  addBalance: (id: string, value: number) => Promise<void>;
-  removeBalance: (id: string, value: number) => Promise<void>;
+  addBalance: (
+    id: string,
+    value: number,
+    trx: Knex.Transaction
+  ) => Promise<void>;
+  removeBalance: (
+    id: string,
+    value: number,
+    trx: Knex.Transaction
+  ) => Promise<void>;
   findAll: (query: IQueryFindAllAccounts) => Promise<Partial<AccountEntity>[]>;
 }
 
 export class AccountsRepository implements IAccountsRepository {
   async create(data: ICreateAccountData) {
-    const result = await db.query(
-      `INSERT INTO "Conta" (tipo, "idAgencia", "idCliente") VALUES ($1, $2, $3) RETURNING *`,
-      [data.tipo, data.idAgencia, data.idCliente]
-    );
-    return result?.rows[0] as AccountEntity | undefined;
+    const trx = await db.transaction();
+    try {
+      const result = await trx.raw(
+        `INSERT INTO "Conta" (tipo, "idAgencia", "idCliente") VALUES (?, ?, ?) RETURNING *`,
+        [data.tipo, data.idAgencia, data.idCliente]
+      );
+      await trx.commit();
+      return result.rows[0] as AccountEntity | undefined;
+    } catch (error) {
+      await trx.rollback();
+      return null;
+    }
   }
 
   async findAll(query: IQueryFindAllAccounts) {
-    const result = await db.query(
+    const result = await db.raw(
       `SELECT 
         c.id AS id,
         c.numero AS numero,
@@ -61,16 +78,15 @@ export class AccountsRepository implements IAccountsRepository {
       FROM "Conta" c
       JOIN "Cliente" cli ON c."idCliente" = cli.id
       JOIN "Agencia" a ON c."idAgencia" = a.id
-      WHERE cli.cpf = $1`,
+      WHERE cli.cpf = ?`,
       [query.cpf]
     );
-
-    return (result?.rows || []) as Partial<AccountEntity>[];
+    return result.rows as Partial<AccountEntity>[];
   }
 
   async findById(id: string, join: boolean = false) {
-    const result = await db.query(
-      `SELECT 
+    const query = `
+      SELECT 
         c.id AS id,
         c.numero AS numero,
         c.saldo AS saldo,
@@ -108,48 +124,27 @@ export class AccountsRepository implements IAccountsRepository {
       JOIN "Agencia" a ON c."idAgencia" = a.id`
           : ""
       }
-      WHERE c.id = $1 LIMIT 1`,
-      [id]
-    );
-
-    return result?.rows[0] as AccountEntity | undefined;
+      WHERE c.id = ? LIMIT 1
+    `;
+    const result = await db.raw(query, [id]);
+    return result.rows[0] as AccountEntity | undefined;
   }
 
-  async addBalance(id: string, value: number) {
-    await db.query(
-      `
-      UPDATE "Conta"
-      SET saldo = saldo + $1
-      WHERE id = $2
-    `,
-      [value, id]
-    );
-
-    return;
+  async addBalance(id: string, value: number, trx: Knex.Transaction) {
+    await trx.raw(`UPDATE "Conta" SET saldo = saldo + ? WHERE id = ?`, [
+      value,
+      id,
+    ]);
   }
 
-  async removeBalance(id: string, value: number) {
-    await db.query(
-      `
-      UPDATE "Conta"
-      SET saldo = saldo - $1
-      WHERE id = $2
-    `,
-      [value, id]
-    );
-
-    return;
+  async removeBalance(id: string, value: number, trx: Knex.Transaction) {
+    await trx.raw(`UPDATE "Conta" SET saldo = saldo - ? WHERE id = ?`, [
+      value,
+      id,
+    ]);
   }
 
   async delete(id: string) {
-    await db.query(
-      `
-      DELETE FROM "Conta"
-      WHERE id = $1
-      `,
-      [id]
-    );
-
-    return;
+    await db.raw(`DELETE FROM "Conta" WHERE id = ?`, [id]);
   }
 }
