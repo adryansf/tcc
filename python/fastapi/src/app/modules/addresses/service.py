@@ -4,7 +4,7 @@ from .entity import AddressEntity
 from .dtos.inputs.create_address import CreateAddressDto
 
 # Commons
-from app.common.errors import BadRequestError, BaseError
+from app.common.errors import BadRequestError, BaseError, InternalServerError
 from app.common.messages import MESSAGES
 from app.common.errors.either import Either, Left, Right
 
@@ -22,4 +22,8 @@ class AddressesService:
             return Left(BadRequestError(MESSAGES['error']['address']['BadRequest']['AlreadyExists']))
         
         new_address = self._repositories['addresses'].create({**data.model_dump(), 'idCliente': idClient})
+
+        if new_address == None:
+            return Left(InternalServerError(MESSAGES['error']['InternalServer']))
+
         return Right(new_address)

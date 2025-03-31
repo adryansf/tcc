@@ -1,5 +1,5 @@
 from app.common.helpers.bcrypt import encrypt_password
-from app.common.errors import BadRequestError, BaseError, NotFoundError
+from app.common.errors import BadRequestError, BaseError, NotFoundError, InternalServerError
 from app.common.messages import MESSAGES
 from app.common.errors.either import Either, Left, Right
 
@@ -39,4 +39,8 @@ class ClientsService:
 
         senha = encrypt_password(data.senha)
         client = self._repository.create({**data.model_dump(), 'senha': senha})
+
+        if client == None:
+            return Left(InternalServerError(MESSAGES['error']['InternalServer']))
+
         return Right(client)

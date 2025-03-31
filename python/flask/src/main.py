@@ -4,8 +4,8 @@ from server import Server
 import os
 
 # Ler .env apenas se ENV for development
-ENV = os.getenv('ENV', 'PRODUCTION').upper()
-if ENV == 'DEVELOPMENT':
+ENV = os.getenv('ENV', 'DEVELOPMENT').upper()
+if ENV != 'PRODUCTION':
     load_dotenv()
 
 PORT = int(os.getenv("SERVER_PORT", 3333))

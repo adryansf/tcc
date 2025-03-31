@@ -8,7 +8,7 @@ from app.common.errors.either import Either, Left, Right
 from app.common.errors.base_error import BaseError
 from app.common.errors import BadRequestError, NotFoundError, UnauthorizedError, InternalServerError
 from app.common.messages import MESSAGES
-from app.database.transactions import endDatabaseTransaction, startDatabaseTransaction
+from app.database import db
 
 # Transactions
 from .entity import TransactionEntity
@@ -47,27 +47,31 @@ class TransactionsService:
 
         if (tipo == TransactionTypeEnum.TRANSFER or tipo == TransactionTypeEnum.WITHDRAWAL) and origin_account['saldo'] < data.valor:
             return Left(BadRequestError(MESSAGES['error']['account']['BadRequest']['BalanceNotEnough']))
+
+        with db.connect() as conn:
+            trx = conn.begin()
+
+            try:
+                if tipo == TransactionTypeEnum.DEPOSIT:
+                    self._repositories['accounts'].add_balance(data.idContaDestino, data.valor, conn)
+                elif tipo == TransactionTypeEnum.TRANSFER:
+                    self._repositories['accounts'].remove_balance(data.idContaOrigem, data.valor, conn)
+                    self._repositories['accounts'].add_balance(data.idContaDestino, data.valor, conn)
+                elif tipo == TransactionTypeEnum.WITHDRAWAL:
+                    self._repositories['accounts'].remove_balance(data.idContaOrigem, data.valor, conn)
+
+                new_transaction = self._repositories['transactions'].create({
+                    **{**data.model_dump(), 'tipo': tipo.value}
+                }, conn)
+
+                trx.commit()
+
+                return Right(new_transaction)
+            except Exception as e:
+                trx.rollback()
+                return Left(InternalServerError())          
+
         
-        startDatabaseTransaction()
-
-        new_transaction = self._repositories['transactions'].create({
-            **{**data.model_dump(), 'tipo': tipo.value},
-        })
-
-        if tipo == TransactionTypeEnum.DEPOSIT:
-            self._repositories['accounts'].add_balance(data.idContaDestino, data.valor)
-        elif tipo == TransactionTypeEnum.TRANSFER:
-            self._repositories['accounts'].remove_balance(data.idContaOrigem, data.valor)
-            self._repositories['accounts'].add_balance(data.idContaDestino, data.valor)
-        elif tipo == TransactionTypeEnum.WITHDRAWAL:
-            self._repositories['accounts'].remove_balance(data.idContaOrigem, data.valor)
-
-        transaction_success = endDatabaseTransaction()
-
-        if not transaction_success:
-            return Left(InternalServerError())
-
-        return Right(new_transaction)
 
     def find_all(self, id_account: str, id_client: str, role: RoleEnum) -> Either[BaseError, List[TransactionEntity]]:
         permission = has_permission(role, RoleEnum.MANAGER)

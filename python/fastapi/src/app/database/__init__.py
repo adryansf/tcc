@@ -1,15 +1,12 @@
 from os import getenv
 from dotenv import load_dotenv
-import psycopg
+from sqlalchemy import create_engine
 
 # Ler .env apenas se ENV for development
-if getenv('ENV') == 'development':
+ENV = getenv('ENV', 'DEVELOPMENT').upper()
+if ENV != 'PRODUCTION':
     load_dotenv()
 
-db = psycopg.connect(
-  host=getenv("DB_HOST"),
-  dbname=getenv("DB_NAME"),
-  user=getenv("DB_USER"),
-  password=getenv("DB_PASSWORD"),
-  port=getenv("DB_PORT")
-)
+DATABASE_URL = f"postgresql://{getenv('DB_USER')}:{getenv('DB_PASSWORD')}@{getenv('DB_HOST')}:{getenv('DB_PORT')}/{getenv('DB_NAME')}"
+
+db = create_engine(DATABASE_URL, pool_size=100, max_overflow=0)

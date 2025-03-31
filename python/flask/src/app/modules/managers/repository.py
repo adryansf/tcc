@@ -1,4 +1,5 @@
 from typing import Optional
+from sqlalchemy.sql import text
 
 # Common
 from app.database import db
@@ -7,12 +8,9 @@ from app.database import db
 from .entity import ManagerEntity
 
 class ManagersRepository:
-    def __init__(self):
-        self._db = db
-
     def find_by_email(self, email: str) -> Optional[ManagerEntity]:
-        with self._db.cursor() as cursor:
-            cursor.execute("""
+        with db.connect() as connection:
+            result = connection.execute(text("""
                 SELECT 
                     m.id, 
                     m."idAgencia" AS "idAgencia",
@@ -25,21 +23,15 @@ class ManagersRepository:
                     m."dataDeCriacao" AS "dataDeCriacao",
                     m."dataDeAtualizacao" AS "dataDeAtualizacao"
                 FROM "Gerente" m
-                WHERE m.email = %s LIMIT 1
-            """, [email])
-
-            columns = [col[0] for col in cursor.description]
-            row = cursor.fetchone()
-            return dict(zip(columns, row)) if row else None
+                WHERE m.email = :email LIMIT 1
+            """), {"email": email})
+            row = result.mappings().first()
+            return dict(row) if row else None
 
     def find_all(self, quantidade: int):
-        with self._db.cursor() as cursor:
-            cursor.execute(
-                '''
-                SELECT * FROM "Gerente" LIMIT %s
-                ''',
-                [quantidade]
-            )
-            columns = [col[0] for col in cursor.description]
-            rows = cursor.fetchall()
-            return [dict(zip(columns, row)) for row in rows]
+        with db.connect() as connection:
+            result = connection.execute(text("""
+                SELECT * FROM "Gerente" LIMIT :quantidade
+            """), {"quantidade": quantidade})
+            rows = result.mappings().all()
+            return [dict(row) for row in rows]

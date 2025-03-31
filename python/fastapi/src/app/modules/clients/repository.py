@@ -1,4 +1,5 @@
 from typing import Optional, TypedDict
+from sqlalchemy import text
 from app.database import db
 
 # Entidades
@@ -14,12 +15,9 @@ class ICreateClientData(TypedDict):
 
 
 class ClientsRepository:
-    def __init__(self):
-        self._db = db
-
     def find_by_cpf(self, cpf: str) -> Optional[ClientEntity]:
-        with self._db.cursor() as cursor:
-            cursor.execute("""
+        with db.connect() as connection:
+            result = connection.execute(text("""
                 SELECT 
                     c.id, 
                     c.cpf as cpf,
@@ -47,16 +45,14 @@ class ClientsRepository:
                     END AS endereco 
                 FROM "Cliente" c
                 LEFT JOIN "Endereco" e ON e."idCliente" = c.id
-                WHERE c.cpf = %s LIMIT 1
-            """, [cpf])
-
-            columns = [col[0] for col in cursor.description]
-            row = cursor.fetchone()
-            return dict(zip(columns, row)) if row else None
+                WHERE c.cpf = :cpf LIMIT 1
+            """), {"cpf": cpf})
+            row = result.mappings().first()  # Use mappings() para garantir que o resultado seja tratado como dicionário
+            return dict(row) if row else None
 
     def find_by_id(self, id: str) -> Optional[ClientEntity]:
-        with self._db.cursor() as cursor:
-            cursor.execute("""
+        with db.connect() as connection:
+            result = connection.execute(text("""
                 SELECT 
                     c.id, 
                     c.cpf as cpf,
@@ -84,16 +80,14 @@ class ClientsRepository:
                     END AS endereco 
                 FROM "Cliente" c
                 LEFT JOIN "Endereco" e ON e."idCliente" = c.id
-                WHERE c.id = %s LIMIT 1
-            """, [id])
-
-            columns = [col[0] for col in cursor.description]
-            row = cursor.fetchone()
-            return dict(zip(columns, row)) if row else None
+                WHERE c.id = :id LIMIT 1
+            """), {"id": id})
+            row = result.mappings().first()
+            return dict(row) if row else None
 
     def find_by_email(self, email: str) -> Optional[ClientEntity]:
-        with self._db.cursor() as cursor:
-            cursor.execute("""
+        with db.connect() as connection:
+            result = connection.execute(text("""
                 SELECT 
                     c.id, 
                     c.cpf as cpf,
@@ -121,29 +115,37 @@ class ClientsRepository:
                     END AS endereco 
                 FROM "Cliente" c
                 LEFT JOIN "Endereco" e ON e."idCliente" = c.id
-                WHERE c.email = %s LIMIT 1
-            """, [email])
-
-            columns = [col[0] for col in cursor.description]
-            row = cursor.fetchone()
-            return dict(zip(columns, row)) if row else None
+                WHERE c.email = :email LIMIT 1
+            """), {"email": email})
+            row = result.mappings().first()
+            return dict(row) if row else None
 
     def create(self, data: ICreateClientData) -> Optional[ClientEntity]:
-        with self._db.cursor() as cursor:
-            cursor.execute("""
-                INSERT INTO "Cliente" (nome, cpf, telefone, "dataDeNascimento", email, senha) VALUES (%s, %s, %s, %s, %s, %s) RETURNING *
-            """, [data["nome"], data["cpf"], data["telefone"], data["dataDeNascimento"], data["email"], data["senha"]])
+        with db.connect() as connection:
+            transaction = connection.begin()
+            try:
+                result = connection.execute(text("""
+                    INSERT INTO "Cliente" (nome, cpf, telefone, "dataDeNascimento", email, senha) 
+                    VALUES (:nome, :cpf, :telefone, :dataDeNascimento, :email, :senha) 
+                    RETURNING *
+                """), {
+                    "nome": data["nome"],
+                    "cpf": data["cpf"],
+                    "telefone": data["telefone"],
+                    "dataDeNascimento": data["dataDeNascimento"],
+                    "email": data["email"],
+                    "senha": data["senha"]
+                })
+                transaction.commit()
+                row = result.mappings().first()
+                return dict(row) if row else None
+            except Exception as e:
+                transaction.rollback()
+                return None
 
-            self._db.commit()
-
-            columns = [col[0] for col in cursor.description]
-            row = cursor.fetchone()
-            return dict(zip(columns, row)) if row else None
-    
     def find_all(self, quantidade: int):
-        with self._db.cursor() as cursor:
-            cursor.execute(
-                '''
+        with db.connect() as connection:
+            result = connection.execute(text("""
                 SELECT 
                     c.id, 
                     c.cpf as cpf,
@@ -155,10 +157,7 @@ class ClientsRepository:
                     c."dataDeCriacao" AS "dataDeCriacao",
                     c."dataDeAtualizacao" AS "dataDeAtualizacao"
                 FROM "Cliente" c
-                LIMIT %s
-                ''',
-                [quantidade]
-            )
-            columns = [col[0] for col in cursor.description]
-            rows = cursor.fetchall()
-            return [dict(zip(columns, row)) for row in rows]
+                LIMIT :quantidade
+            """), {"quantidade": quantidade})
+            rows = result.mappings().all()
+            return [dict(row) for row in rows]

@@ -21,7 +21,7 @@ class Server:
     def start(self):
         if self._env == "PRODUCTION":
             print(f"Servidor Rodando na porta {self._port}")
-            serve(self._server, host='0.0.0.0', port=self._port)
+            serve(self._server, host='0.0.0.0', port=self._port, connection_limit=10000)
         else:
             self._server.run(port=self._port, debug=self._debug)
 

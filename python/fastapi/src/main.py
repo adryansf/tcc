@@ -5,7 +5,7 @@ import os
 
 # Ler .env apenas se ENV for development
 ENV = os.getenv('ENV', 'PRODUCTION').upper()
-if ENV == 'DEVELOPMENT':
+if ENV  != 'PRODUCTION':
     load_dotenv()
 
 PORT = int(os.getenv("SERVER_PORT", 3333))

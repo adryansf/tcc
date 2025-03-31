@@ -5,9 +5,9 @@ from os import getenv
 import uuid
 
 # Ler .env apenas se ENV for development
-if getenv('ENV') == 'development':
+ENV = getenv('ENV', 'DEVELOPMENT').upper()
+if ENV != 'PRODUCTION':
     load_dotenv()
-
 EXPIRES_IN = int(getenv('JWT_EXPIRES_IN')) or 86400
 SECRET_KEY = getenv("JWT_SECRET")
 ALGORITHM = "HS256"  # Algoritmo de assinatura

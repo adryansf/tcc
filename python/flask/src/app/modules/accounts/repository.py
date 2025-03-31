@@ -1,8 +1,9 @@
 from typing import TypedDict
 from uuid import UUID
+from sqlalchemy import text, Connection
+from app.database import db
 
 from .enums.account_type import AccountTypeEnum
-from app.database import db
 
 class ICreateAccountData(TypedDict):
     tipo: AccountTypeEnum
@@ -13,26 +14,29 @@ class IQueryFindAllAccounts(TypedDict):
     cpf: str
 
 class AccountsRepository:
-    def __init__(self):
-        self._db = db
-
     def create(self, data: ICreateAccountData):
-        with self._db.cursor() as cursor:
-            cursor.execute(
-                'INSERT INTO "Conta" (tipo, "idAgencia", "idCliente") VALUES (%s, %s, %s) RETURNING *',
-                [data['tipo'], data['idAgencia'], data['idCliente']]
-            )
-
-            self._db.commit()
-
-            columns = [col[0] for col in cursor.description]
-            row = cursor.fetchone()
-            return dict(zip(columns, row)) if row else None
+        with db.connect() as connection:
+            transaction = connection.begin()
+            try:
+                result = connection.execute(text("""
+                    INSERT INTO "Conta" (tipo, "idAgencia", "idCliente") 
+                    VALUES (:tipo, :idAgencia, :idCliente) 
+                    RETURNING *
+                """), {
+                    "tipo": data["tipo"],
+                    "idAgencia": data["idAgencia"],
+                    "idCliente": data["idCliente"]
+                })
+                transaction.commit()
+                row = result.mappings().first()
+                return dict(row) if row else None
+            except Exception:
+                transaction.rollback()
+                return None
 
     def find_all(self, query: IQueryFindAllAccounts):
-        with self._db.cursor() as cursor:
-            cursor.execute(
-                '''
+        with db.connect() as connection:
+            result = connection.execute(text("""
                 SELECT 
                     c.id AS id,
                     c.numero AS numero,
@@ -43,8 +47,8 @@ class AccountsRepository:
                         'id', cli.id,
                         'nome', cli.nome,
                         'cpf', cli.cpf,
-          'dataDeNascimento', cli."dataDeNascimento",
-          'telefone', cli.telefone,
+                        'dataDeNascimento', cli."dataDeNascimento",
+                        'telefone', cli.telefone,
                         'email', cli.email,
                         'dataDeCriacao', cli."dataDeCriacao",
                         'dataDeAtualizacao', cli."dataDeAtualizacao"
@@ -60,18 +64,14 @@ class AccountsRepository:
                 FROM "Conta" c
                 JOIN "Cliente" cli ON c."idCliente" = cli.id
                 JOIN "Agencia" a ON c."idAgencia" = a.id
-                WHERE cli.cpf = %s
-                ''',
-                [query['cpf']]
-            )
-            columns = [col[0] for col in cursor.description]
-            rows = cursor.fetchall()
-            return [dict(zip(columns, row)) for row in rows]
+                WHERE cli.cpf = :cpf
+            """), {"cpf": query["cpf"]})
+            rows = result.mappings().all()
+            return [dict(row) for row in rows]
 
-    
     def find_by_id(self, id: str, join: bool = False):
-        with self._db.cursor() as cursor:
-            query = '''
+        with db.connect() as connection:
+            base_query = '''
                 SELECT 
                     c.id AS id,
                     c.numero AS numero,
@@ -83,13 +83,13 @@ class AccountsRepository:
                     c."dataDeAtualizacao" as "dataDeAtualizacao"
             '''
             if join:
-                query += '''
+                base_query += '''
                     ,json_build_object(
                         'id', cli.id,
                         'nome', cli.nome,
                         'cpf', cli.cpf,
-          'dataDeNascimento', cli."dataDeNascimento",
-          'telefone', cli.telefone,
+                        'dataDeNascimento', cli."dataDeNascimento",
+                        'telefone', cli.telefone,
                         'email', cli.email,
                         'dataDeCriacao', cli."dataDeCriacao",
                         'dataDeAtualizacao', cli."dataDeAtualizacao"
@@ -103,40 +103,31 @@ class AccountsRepository:
                         'dataDeAtualizacao', a."dataDeAtualizacao"
                     ) AS agencia
                 '''
-            query += ' FROM "Conta" c '
+            base_query += ' FROM "Conta" c '
             if join:
-                query += ' JOIN "Cliente" cli ON c."idCliente" = cli.id JOIN "Agencia" a ON c."idAgencia" = a.id '
-            query += ' WHERE c.id = %s LIMIT 1'
+                base_query += '''
+                    JOIN "Cliente" cli ON c."idCliente" = cli.id
+                    JOIN "Agencia" a ON c."idAgencia" = a.id
+                '''
+            base_query += ' WHERE c.id = :id LIMIT 1'
 
-            cursor.execute(query, [id])
-            
-            columns = [col[0] for col in cursor.description]
-            row = cursor.fetchone()
-            return dict(zip(columns, row)) if row else None
+            query = text(base_query)
+            result = connection.execute(query, {"id": id})
+            row = result.mappings().first()
+            return dict(row) if row else None
 
-    def add_balance(self, id: str, value: float):
-        with self._db.cursor() as cursor:
-            cursor.execute(
-                'UPDATE "Conta" SET saldo = saldo + %s WHERE id = %s',
-                [value, id]
-            )
+    def add_balance(self, id: str, value: float, trx: Connection):
+        trx.execute(text("""
+            UPDATE "Conta" SET saldo = saldo + :value WHERE id = :id
+        """), {"value": value, "id": id})
 
-            return
-
-    def remove_balance(self, id: str, value: float):
-        with self._db.cursor() as cursor:
-            cursor.execute(
-                'UPDATE "Conta" SET saldo = saldo - %s WHERE id = %s',
-                [value, id]
-            )
-
-            return
+    def remove_balance(self, id: str, value: float, trx: Connection):
+        trx.execute(text("""
+            UPDATE "Conta" SET saldo = saldo - :value WHERE id = :id
+        """), {"value": value, "id": id})
 
     def delete(self, id: str):
-        with self._db.cursor() as cursor:
-            cursor.execute(
-                'DELETE FROM "Conta" WHERE id = %s',
-                [id]
-            )
-
-            return
+        with db.connect() as connection:
+            connection.execute(text("""
+                DELETE FROM "Conta" WHERE id = :id
+            """), {"id": id})

@@ -5,7 +5,7 @@ from uuid import UUID
 from app.common.helpers import has_permission
 from app.common.errors.either import Either, Left, Right
 from app.common.errors.base_error import BaseError
-from app.common.errors import BadRequestError, NotFoundError, UnauthorizedError
+from app.common.errors import BadRequestError, NotFoundError, UnauthorizedError, InternalServerError
 from app.common.messages import MESSAGES
 from app.common.enums import RoleEnum
 
@@ -53,6 +53,9 @@ class AccountsService:
             'tipo': data.tipo.value,
             'idCliente': id_client,
         })
+
+        if(new_account == None):
+            return Left(InternalServerError(MESSAGES['error']['InternalServer']))
 
         return Right(new_account)
 

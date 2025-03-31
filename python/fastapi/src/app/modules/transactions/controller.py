@@ -23,8 +23,6 @@ class TransactionsController(BaseController):
         try:
             id_conta = idConta
 
-            print(id_conta)
-
             query = FindAllQueryTransactionsDto(**{'idConta': id_conta})
 
             result = self._service.find_all(query.idConta, request.state.auth['id'], request.state.auth['role'])

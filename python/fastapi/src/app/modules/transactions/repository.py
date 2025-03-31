@@ -1,5 +1,6 @@
 from typing import TypedDict
 from uuid import UUID
+from sqlalchemy import Connection, text
 
 # Common
 from app.database import db
@@ -15,28 +16,27 @@ class ICreateTransactionData(TypedDict):
 
 
 class TransactionsRepository:
-    def __init__(self):
-        self._db = db
-
-    def create(self, data: ICreateTransactionData):
-        with self._db.cursor() as cursor:
-            cursor.execute(
-                '''
-                INSERT INTO "Transacao" (tipo, valor, "idContaOrigem", "idContaDestino") 
-                VALUES (%s, %s, %s, %s) 
-                RETURNING *;
-                ''',
-                [data['tipo'], data['valor'], data['idContaOrigem'], data['idContaDestino']]
-            )
-
-            columns = [col[0] for col in cursor.description]
-            row = cursor.fetchone()
-            return dict(zip(columns, row)) if row else None
+    def create(self, data: ICreateTransactionData, trx: Connection):
+        result = trx.execute(
+            text('''
+            INSERT INTO "Transacao" (tipo, valor, "idContaOrigem", "idContaDestino") 
+            VALUES (:tipo, :valor, :idContaOrigem, :idContaDestino) 
+            RETURNING *;
+            '''),
+            {
+                'tipo': data['tipo'],
+                'valor': data['valor'],
+                'idContaOrigem': data['idContaOrigem'],
+                'idContaDestino': data['idContaDestino']
+            }
+        )
+        row = result.mappings().fetchone()
+        return dict(row) if row else None
 
     def find_all(self, id_conta: str):
-        with self._db.cursor() as cursor:
-            cursor.execute(
-                '''
+        with db.connect() as conn:
+            result = conn.execute(
+                text('''
                 SELECT 
                 t.id AS id,
                 t.valor AS valor,
@@ -107,11 +107,10 @@ class TransactionsRepository:
             LEFT JOIN "Conta" d ON t."idContaDestino" = d.id
             LEFT JOIN "Cliente" cli_d ON d."idCliente" = cli_d.id
             LEFT JOIN "Agencia" a_d ON d."idAgencia" = a_d.id
-            WHERE t."idContaOrigem" = %s OR t."idContaDestino" = %s
+            WHERE t."idContaOrigem" = :id_conta OR t."idContaDestino" = :id_conta
             ORDER BY t."dataDeCriacao" DESC;
-                ''',
-                [id_conta, id_conta]
+                '''),
+                {'id_conta': id_conta}
             )
-            columns = [col[0] for col in cursor.description]
-            rows = cursor.fetchall()
-            return [dict(zip(columns, row)) for row in rows]
+            rows = result.mappings().fetchall()
+            return [dict(row) for row in rows]
