@@ -21,11 +21,11 @@ export class Server implements IServer {
     this._host = host;
   }
 
-  register<Options>(
+  async register<Options>(
     plugin: FastifyPluginCallback,
     options?: FastifyRegisterOptions<Options>
   ) {
-    this._server.register(plugin, options);
+    await this._server.register(plugin, options);
   }
 
   route(router: RouteOptions[]) {

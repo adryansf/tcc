@@ -21,10 +21,10 @@ export class App implements IApp {
     this._server = server;
   }
 
-  loadPlugins() {
-    this._server.register(cors);
+  async loadPlugins() {
+    await this._server.register(cors);
     // COMPRESSÃO GZIP
-    this._server.register<FastifyCompressOptions>(compress, {
+    await this._server.register<FastifyCompressOptions>(compress, {
       global: true,
       encodings: ["gzip"],
     });
@@ -37,8 +37,8 @@ export class App implements IApp {
     }
   }
 
-  start() {
-    this.loadPlugins();
+  async start() {
+    await this.loadPlugins();
     this.loadModules();
     this._server.start();
   }
