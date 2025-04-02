@@ -27,6 +27,7 @@ export class App implements IApp {
     await this._server.register<FastifyCompressOptions>(compress, {
       global: true,
       encodings: ["gzip"],
+      threshold: 0,
     });
   }
 
