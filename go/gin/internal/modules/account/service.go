@@ -60,6 +60,10 @@ func (s *AccountService) Create(data dto.CreateAccountDto, idClient string, payl
 	})
 
 
+	if newAccount == nil {
+		return nil, errors.InternalServerError(messages.ErrorMessages.InternalServer)
+	}
+
 	return newAccount, nil
 }
 

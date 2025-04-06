@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"tcc/internal/modules/account/entity"
 	"tcc/internal/modules/transaction/enum"
+	"tcc/internal/types"
 
 	"github.com/google/uuid"
 )
@@ -14,7 +15,7 @@ type TransactionEntity struct {
 	Tipo           enum.TransactionTypeEnum						`json:"tipo"`
 	IDContaOrigem  *uuid.UUID													`json:"idContaOrigem,omitempty"`
 	IDContaDestino *uuid.UUID													`json:"idContaDestino,omitempty"`
-	DataDeCriacao  string															`json:"dataDeCriacao"`
+	DataDeCriacao  types.CustomTime										`json:"dataDeCriacao"`
 	ContaOrigem    *entity.AccountEntity							`json:"contaOrigem,omitempty"`
 	ContaDestino   *entity.AccountEntity							`json:"contaDestino,omitempty"`
 }

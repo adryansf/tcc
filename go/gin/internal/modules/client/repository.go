@@ -1,7 +1,10 @@
 package client
 
 import (
+	"context"
 	"database/sql"
+	"log"
+	"tcc/internal/database"
 	"tcc/internal/modules/client/entity"
 	"time"
 )
@@ -16,28 +19,52 @@ type ICreateClientData struct {
 }
 
 type ClientRepository struct{
-	db *sql.DB
-}
-
-
-func NewClientRepository (db *sql.DB) ClientRepository{
-	return ClientRepository{
-		db: db,
-	}
 }
 
 func (r *ClientRepository) Create(data ICreateClientData) (*entity.ClientEntity, error) {
+  var dataDeNascimento time.Time
 	var client entity.ClientEntity
-	err := r.db.QueryRow(`
+  ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+  // Iniciar a transação
+	tx, err := database.Conn.Begin(ctx)
+	if err != nil {
+		log.Printf("erro ao iniciar transação: %v", err)
+		return nil, err
+	}
+
+	// Em caso de erro, faz rollback
+	defer func() {
+		if err != nil {
+			log.Println("Rollback da transação")
+			tx.Rollback(ctx)
+		}
+	}()
+
+	row := tx.QueryRow(ctx, `
 		INSERT INTO "Cliente" (nome, cpf, telefone, "dataDeNascimento", email, senha)
 		VALUES ($1, $2, $3, $4, $5, $6)
 		RETURNING id, nome, cpf, telefone, "dataDeNascimento", email, senha, "dataDeCriacao", "dataDeAtualizacao"
-	`, data.Nome, data.CPF, data.Telefone, data.DataDeNascimento, data.Email, data.Senha).Scan(
-		&client.ID, &client.Nome, &client.CPF, &client.Telefone, &client.DataDeNascimento, &client.Email, &client.Senha, &client.DataDeCriacao, &client.DataDeAtualizacao)
+	`, data.Nome, data.CPF, data.Telefone, data.DataDeNascimento, data.Email, data.Senha)
+
+  err = row.Scan(
+		&client.ID, &client.Nome, &client.CPF, &client.Telefone, &dataDeNascimento, &client.Email, &client.Senha, &client.DataDeCriacao, &client.DataDeAtualizacao)
+  
+  if err != nil {
+    log.Printf("erro ao criar cliente: %v", err)
+    return nil, err
+  }
+
+  client.DataDeNascimento = dataDeNascimento.Format(time.DateOnly)
+
+  err = tx.Commit(ctx)
 
 	if err != nil {
+		log.Printf("erro ao commitar transação: %v", err)
 		return nil, err
 	}
+	
 	return &client, nil
 }
 
@@ -45,11 +72,14 @@ func (r *ClientRepository) FindById(id string) (*entity.ClientEntity, error) {
 	var client entity.ClientEntity
 	var endereco sql.NullString
   var dataDeNascimento time.Time
-	err := r.db.QueryRow(`
+
+  ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	err := database.Conn.QueryRow(ctx,`
 		SELECT 
         c.id, 
-        c.cpf as cpf,
         c.nome AS nome,
+        c.cpf as cpf,
         c.telefone AS telefone,
         c."dataDeNascimento" AS "dataDeNascimento",
         c.email AS email,
@@ -77,6 +107,7 @@ func (r *ClientRepository) FindById(id string) (*entity.ClientEntity, error) {
 	`, id).Scan(&client.ID, &client.Nome, &client.CPF, &client.Telefone, &dataDeNascimento, &client.Email, &client.Senha, &client.DataDeCriacao, &client.DataDeAtualizacao, &endereco)
 	
 	if err != nil {
+    // log.Printf("erro: %v", err)
 		return nil, err
 	}
 
@@ -92,11 +123,14 @@ func (r *ClientRepository) FindByCPF(cpf string) (*entity.ClientEntity, error) {
 	var client entity.ClientEntity
 	var endereco sql.NullString
   var dataDeNascimento time.Time
-	err := r.db.QueryRow(`
+  ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	err := database.Conn.QueryRow(ctx,`
 		SELECT 
         c.id, 
-        c.cpf as cpf,
         c.nome AS nome,
+        c.cpf as cpf,
         c.telefone AS telefone,
         c."dataDeNascimento" AS "dataDeNascimento",
         c.email AS email,
@@ -122,7 +156,9 @@ func (r *ClientRepository) FindByCPF(cpf string) (*entity.ClientEntity, error) {
       LEFT JOIN "Endereco" e ON e."idCliente" = c.id
       WHERE c.cpf = $1 LIMIT 1
 	`, cpf).Scan(&client.ID, &client.Nome, &client.CPF, &client.Telefone, &dataDeNascimento, &client.Email, &client.Senha, &client.DataDeCriacao, &client.DataDeAtualizacao, &endereco)
-	if err != nil {
+	
+  if err != nil {
+    // log.Printf("erro: %v", err)
 		return nil, err
 	}
 
@@ -139,11 +175,15 @@ func (r *ClientRepository) FindByEmail(email string) (*entity.ClientEntity, erro
 	var client entity.ClientEntity
 	var endereco sql.NullString
   var dataDeNascimento time.Time
-	err := r.db.QueryRow(`
+
+  ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	err := database.Conn.QueryRow(ctx,`
 		SELECT 
         c.id, 
-        c.cpf as cpf,
         c.nome AS nome,
+        c.cpf as cpf,
         c.telefone AS telefone,
         c."dataDeNascimento" AS "dataDeNascimento",
         c.email AS email,
@@ -182,11 +222,13 @@ func (r *ClientRepository) FindByEmail(email string) (*entity.ClientEntity, erro
 }
 
 func (r *ClientRepository) FindAll(quantidade int) ([]*entity.ClientEntity, error) {
-	rows, err := r.db.Query(
+  ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	rows, err := database.Conn.Query(ctx,
 		`SELECT 
         c.id, 
-        c.cpf as cpf,
         c.nome AS nome,
+        c.cpf as cpf,
         c.telefone AS telefone,
         c."dataDeNascimento" AS "dataDeNascimento",
         c.email AS email,
@@ -208,6 +250,7 @@ func (r *ClientRepository) FindAll(quantidade int) ([]*entity.ClientEntity, erro
     var dataDeNascimento time.Time
 		err := rows.Scan(&client.ID, &client.Nome, &client.CPF, &client.Telefone, &dataDeNascimento, &client.Email, &client.Senha, &client.DataDeCriacao, &client.DataDeAtualizacao)
 		if err != nil {
+      log.Printf("%v", err)
 			return nil, err
 		}
 

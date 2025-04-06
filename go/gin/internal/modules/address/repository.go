@@ -1,8 +1,11 @@
 package address
 
 import (
-	"database/sql"
+	"context"
+	"log"
+	"tcc/internal/database"
 	"tcc/internal/modules/address/entity"
+	"time"
 )
 
 type ICreateAddressData struct {
@@ -23,16 +26,43 @@ type IAddressRepository interface {
 }
 
 type AddressRepository struct {
-	db *sql.DB
 }
 
 func (r *AddressRepository) Create(data ICreateAddressData) (*entity.AddressEntity, error) {
 	query := `INSERT INTO "Endereco" (logradouro, numero, bairro, cidade, uf, cep, "idCliente", complemento) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`
-	row := r.db.QueryRow(query, data.Logradouro, data.Numero, data.Bairro, data.Cidade, data.UF, data.CEP, data.IDCliente, data.Complemento)
+	
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
 
-	var address entity.AddressEntity
-	err := row.Scan(&address.ID, &address.Logradouro, &address.Numero, &address.Bairro, &address.Cidade, &address.UF, &address.Complemento, &address.CEP, &address.IDCliente, &address.DataDeCriacao, &address.DataDeAtualizacao)
+	// Iniciar a transação
+	tx, err := database.Conn.Begin(ctx)
 	if err != nil {
+		log.Printf("erro ao iniciar transação: %v", err)
+		return nil, err
+	}
+
+	// Em caso de erro, faz rollback
+	defer func() {
+		if err != nil {
+			log.Println("Rollback da transação")
+			tx.Rollback(ctx)
+		}
+	}()
+
+	row := tx.QueryRow(ctx, query, data.Logradouro, data.Numero, data.Bairro, data.Cidade, data.UF, data.CEP, data.IDCliente, data.Complemento)
+	
+	var address entity.AddressEntity
+	err = row.Scan(&address.ID, &address.Logradouro, &address.Numero, &address.Bairro, &address.Cidade, &address.UF, &address.Complemento, &address.CEP, &address.IDCliente, &address.DataDeCriacao, &address.DataDeAtualizacao)
+
+	if err != nil {
+		log.Printf("erro ao inserir endereço: %v", err)
+		return nil, err
+	}
+	
+	err = tx.Commit(ctx)
+
+	if err != nil {
+		log.Printf("erro ao commitar transação: %v", err)
 		return nil, err
 	}
 
@@ -41,7 +71,9 @@ func (r *AddressRepository) Create(data ICreateAddressData) (*entity.AddressEnti
 
 func (r *AddressRepository) FindByIdClient(idClient string) (*entity.AddressEntity, error) {
 	query := `SELECT * FROM "Endereco" e WHERE e."idCliente" = $1`
-	row := r.db.QueryRow(query, idClient)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	row := database.Conn.QueryRow(ctx, query, idClient)
 
 	var address entity.AddressEntity
 	err := row.Scan(&address.ID, &address.Logradouro, &address.Numero, &address.Bairro, &address.Cidade, &address.UF, &address.Complemento, &address.CEP, &address.IDCliente, &address.DataDeCriacao, &address.DataDeAtualizacao)

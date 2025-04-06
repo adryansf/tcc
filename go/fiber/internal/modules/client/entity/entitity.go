@@ -3,6 +3,7 @@ package entity
 import (
 	"encoding/json"
 	"tcc/internal/modules/address/entity"
+	"tcc/internal/types"
 
 	"github.com/google/uuid"
 )
@@ -15,8 +16,8 @@ type ClientEntity struct {
 	DataDeNascimento string       `json:"dataDeNascimento"`
 	Email           string          `json:"email"`
 	Senha           string          `json:"-"`
-	DataDeCriacao   string       `json:"dataDeCriacao"`
-	DataDeAtualizacao string     `json:"dataDeAtualizacao"`
+	DataDeCriacao   types.CustomTime       `json:"dataDeCriacao"`
+	DataDeAtualizacao types.CustomTime     `json:"dataDeAtualizacao"`
 	Endereco        *entity.AddressEntity     `json:"endereco,omitempty"` 
 }
 

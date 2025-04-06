@@ -1,7 +1,6 @@
 package client
 
 import (
-	"database/sql"
 	"tcc/internal/common/enum"
 	"tcc/internal/common/middleware"
 	auth "tcc/internal/modules/auth/middleware"
@@ -9,10 +8,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func ClientModule(router *fiber.App, db *sql.DB) {
-	repository := ClientRepository{
-		db: db,
-	}
+func ClientModule(router *fiber.App) {
+	repository := ClientRepository{}
 	service := ClientService{
 		repository: repository,
 	}

@@ -1,25 +1,20 @@
 package auth
 
 import (
-	"database/sql"
-
 	"tcc/internal/modules/client"
 	"tcc/internal/modules/manager"
 
 	"github.com/gin-gonic/gin"
 )
 
-func AuthModule(router *gin.Engine, db *sql.DB) {
-	clientRepository := client.NewClientRepository(db)
-	managerRepository := manager.NewManagerRepository(db)
-
+func AuthModule(router *gin.Engine) {
 	service := AuthService{
 		repository: struct{
 			client client.ClientRepository
 			manager manager.ManagerRepository
 			}{
-			client: clientRepository,
-			manager: managerRepository,
+			client: client.ClientRepository{},
+			manager: manager.ManagerRepository{},
 		},
 	}
 	controller := AuthController{

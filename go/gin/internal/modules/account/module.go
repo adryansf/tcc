@@ -1,7 +1,6 @@
 package account
 
 import (
-	"database/sql"
 	auth "tcc/internal/modules/auth/middleware"
 	"tcc/internal/modules/branch"
 	"tcc/internal/modules/client"
@@ -10,21 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AccountModule(router *gin.Engine, db *sql.DB) {
-	accountRepository := AccountRepository{
-		db: db,
-	}
-	clientRepository := client.NewClientRepository(db)
-	branchRepository := branch.NewBranchRepository(db)
-	managerRepository := manager.NewManagerRepository(db)
-
-
+func AccountModule(router *gin.Engine) {
 	service := AccountService{
 		repository: struct{account AccountRepository; client client.ClientRepository; branch branch.BranchRepository; manager manager.ManagerRepository}{
-			account: accountRepository,
-			client: clientRepository,
-			branch: branchRepository,
-			manager: managerRepository,
+			account: AccountRepository{},
+			client: client.ClientRepository{},
+			branch: branch.BranchRepository{},
+			manager: manager.ManagerRepository{},
 		},
 	}
 	controller := AccountController{

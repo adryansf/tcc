@@ -1,15 +1,17 @@
 package database
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"os"
 
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 
-func Connect() (*sql.DB, error) {
+var Conn *pgxpool.Pool
+
+func Connect() error {
 	var (
 		host     = os.Getenv("DB_HOST")
 		port     = os.Getenv("DB_PORT")
@@ -18,20 +20,30 @@ func Connect() (*sql.DB, error) {
 		dbname   = os.Getenv("DB_NAME")
 	)
 
-	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+	url := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+	host, port, user, password, dbname)
 
-
-	db, err := sql.Open("postgres", psqlInfo)
+	config, err := pgxpool.ParseConfig(url)
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("erro ao analisar config: %w", err)
 	}
 
-	err = db.Ping()
+	// Define min e max conexões
+	config.MinConns = 100
+	config.MaxConns = 100
+
+	// Cria a pool com a configuração personalizada
+	Conn, err = pgxpool.NewWithConfig(context.Background(), config)
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("erro ao criar pool: %w", err)
 	}
 
-	fmt.Println("Conectado no Banco de Dados")
-	return db, nil
+	return nil
+}
+
+func Close() {
+	if Conn == nil {
+		return
+	}
+	Conn.Close()
 }

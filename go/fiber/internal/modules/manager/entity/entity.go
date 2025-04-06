@@ -3,6 +3,7 @@ package entity
 import (
 	"encoding/json"
 	"tcc/internal/modules/branch/entity"
+	"tcc/internal/types"
 
 	"github.com/google/uuid"
 )
@@ -16,8 +17,8 @@ type ManagerEntity struct {
 	DataDeNascimento string             `json:"dataDeNascimento"`
 	Email            string                `json:"email"`
 	Senha            string                `json:"-"`
-	DataDeCriacao    string             `json:"dataDeCriacao"`
-	DataDeAtualizacao string            `json:"dataDeAtualizacao"`
+	DataDeCriacao    types.CustomTime             `json:"dataDeCriacao"`
+	DataDeAtualizacao types.CustomTime           `json:"dataDeAtualizacao"`
 	Agencia          *entity.BranchEntity  `json:"agencia,omitempty"`
 }
 

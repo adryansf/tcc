@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 	"tcc/internal/database"
 	"tcc/internal/modules/account"
@@ -29,28 +30,26 @@ func main() {
 	// CORS
 	server.Use(cors.New(cors.Config{
     AllowOrigins: "*",
-		
 	}))
 
-	db, err := database.Connect()
-
-	if err != nil {
+	if err := database.Connect(); err != nil {
 		panic(err)
 	}
+	defer database.Close()
 
 	// Load Modules
-	auth.AuthModule(server, db)
-	client.ClientModule(server, db)
-	address.AddressModule(server, db)
-	branch.BranchModule(server, db)
-	account.AccountModule(server, db)
-	transaction.TransactionModule(server, db)
-	admin.AdminModule(server, db)
+	auth.AuthModule(server)
+	client.ClientModule(server)
+	address.AddressModule(server)
+	branch.BranchModule(server)
+	account.AccountModule(server)
+	transaction.TransactionModule(server)
+	admin.AdminModule(server)
 
 	port := os.Getenv("SERVER_PORT")
 	if port == "" {
 		port = "3333" // Porta padrão
 	}
 
-	server.Listen(":" + port)
+	log.Fatal(server.Listen(":" + port))
 }

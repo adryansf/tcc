@@ -1,6 +1,8 @@
 package entity
 
 import (
+	"tcc/internal/types"
+
 	"github.com/google/uuid"
 )
 
@@ -14,6 +16,6 @@ type AddressEntity struct {
 	Complemento     *string    		`json:"complemento,omitempty"`
 	CEP             string     		`json:"cep"`
 	IDCliente       *uuid.UUID     `json:"idCliente,omitempty"`
-	DataDeCriacao   string  		`json:"dataDeCriacao"`
-	DataDeAtualizacao string 	`json:"dataDeAtualizacao"`
+	DataDeCriacao   types.CustomTime  		`json:"dataDeCriacao"`
+	DataDeAtualizacao types.CustomTime 	`json:"dataDeAtualizacao"`
 }

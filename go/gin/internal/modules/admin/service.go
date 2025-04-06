@@ -19,6 +19,7 @@ type AdminService struct{
 func (s *AdminService) FindAllClients(quantidade int) ([]*c.ClientEntity, *errors.BaseError) {
 	clients, _ := s.repository.client.FindAll(quantidade)
 
+
 	if clients == nil {
 		return []*c.ClientEntity{}, nil
 	}

@@ -1,22 +1,20 @@
 package manager
 
 import (
-	"database/sql"
+	"context"
+	"tcc/internal/database"
 	"tcc/internal/modules/manager/entity"
 	"time"
 )
 
 type ManagerRepository struct {
-	db *sql.DB
-}
-
-func NewManagerRepository(db *sql.DB) ManagerRepository {
-	return ManagerRepository{db: db}
 }
 
 func (r *ManagerRepository) FindByEmail(email string) (*entity.ManagerEntity, error) {
 	query := `SELECT * FROM "Gerente" WHERE email = $1 LIMIT 1`
-	row := r.db.QueryRow(query, email)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	row := database.Conn.QueryRow(ctx, query, email)
 
 	var manager entity.ManagerEntity
 	var dataDeNascimento time.Time
@@ -44,7 +42,9 @@ func (r *ManagerRepository) FindByEmail(email string) (*entity.ManagerEntity, er
 
 
 func (r *ManagerRepository) FindAll(quantidade int) ([]*entity.ManagerEntity, error) {
-	rows, err := r.db.Query(
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	rows, err := database.Conn.Query(ctx,
 		`SELECT * FROM "Gerente" LIMIT $1`,
 		quantidade,
 	)

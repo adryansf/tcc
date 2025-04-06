@@ -38,5 +38,9 @@ func (s *AddressService) Create(data dto.CreateAddressDto, idClient string) (*en
 		Complemento: data.Complemento,
 	})
 
+	if newAddress == nil {
+		return nil, errors.InternalServerError(messages.ErrorMessages.InternalServer)
+	}
+
 	return newAddress, nil
 }

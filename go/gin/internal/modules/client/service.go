@@ -26,8 +26,8 @@ func (s *ClientService) Create(data ICreateClientData) (*entity.ClientEntity, *e
 
 	data.Senha = encryptedPass
 
-	client, err := s.repository.Create(data)
-	if err != nil {
+	client, _ := s.repository.Create(data)
+	if client == nil {
 		return nil, errors.InternalServerError(messages.ErrorMessages.InternalServer)
 	}
 

@@ -1,18 +1,21 @@
 package branch
 
 import (
-	"database/sql"
+	"context"
 	"log" // Adicionado para log de erros
+	"tcc/internal/database"
 	"tcc/internal/modules/branch/entity"
+	"time"
 )
 
 type BranchRepository struct {
-	db *sql.DB
 }
 
 func (r *BranchRepository) FindById(id string) (*entity.BranchEntity, error) {
 	query := `SELECT * FROM "Agencia" a WHERE a.id = $1 LIMIT 1`
-	row := r.db.QueryRow(query, id)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	row := database.Conn.QueryRow(ctx, query, id)
 
 	var branch entity.BranchEntity
 	err := row.Scan(&branch.ID, &branch.Nome, &branch.Telefone, &branch.Numero, &branch.DataDeCriacao, &branch.DataDeAtualizacao)
@@ -26,8 +29,12 @@ func (r *BranchRepository) FindById(id string) (*entity.BranchEntity, error) {
 
 func (r *BranchRepository) FindAll() ([]*entity.BranchEntity, error) {
 	query := `SELECT * FROM "Agencia"`
-	rows, err := r.db.Query(query)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	rows, err := database.Conn.Query(ctx, query)
 	if err != nil {
+		log.Printf("Erro ao buscar agências: %v", err) // Log de erro
 		return nil, err
 	}
 	defer rows.Close()
@@ -37,7 +44,7 @@ func (r *BranchRepository) FindAll() ([]*entity.BranchEntity, error) {
 		var branch entity.BranchEntity
 		err := rows.Scan(&branch.ID, &branch.Nome, &branch.Telefone, &branch.Numero, &branch.DataDeCriacao, &branch.DataDeAtualizacao)
 		if err != nil {
-			log.Printf("Erro ao escanear agência: %v", err) // Log de erro
+			log.Printf("Erro ao escanear agências: %v", err) // Log de erro
 			return nil, err
 		}
 		branches = append(branches, &branch)
@@ -49,10 +56,4 @@ func (r *BranchRepository) FindAll() ([]*entity.BranchEntity, error) {
 	}
 
 	return branches, nil
-}
-
-func NewBranchRepository (db *sql.DB) BranchRepository{
-	return BranchRepository{
-		db: db,
-	}
 }

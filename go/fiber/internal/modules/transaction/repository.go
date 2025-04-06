@@ -1,10 +1,15 @@
 package transaction
 
 import (
+	"context"
 	"database/sql"
 	"log"
+	"tcc/internal/database"
 	"tcc/internal/modules/transaction/entity"
 	"tcc/internal/modules/transaction/enum"
+	"time"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type ICreateTransactionData struct {
@@ -16,12 +21,14 @@ type ICreateTransactionData struct {
 
 
 type TransactionsRepository struct {
-	db *sql.DB
 }
 
-func (r *TransactionsRepository) Create(tx *sql.Tx, data ICreateTransactionData) (*entity.TransactionEntity, error) {
+func (r *TransactionsRepository) Create(data ICreateTransactionData, tx pgx.Tx) (*entity.TransactionEntity, error) {
 	var transaction entity.TransactionEntity
-	err := tx.QueryRow(
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	err := tx.QueryRow(ctx,
 		`INSERT INTO "Transacao" (tipo, valor, "idContaOrigem", "idContaDestino") 
 		VALUES ($1, $2, $3, $4) 
 		RETURNING *;`,
@@ -35,7 +42,10 @@ func (r *TransactionsRepository) Create(tx *sql.Tx, data ICreateTransactionData)
 }
 
 func (r *TransactionsRepository) FindAll(idConta string) ([]*entity.TransactionEntity, error) {
-	rows, err := r.db.Query(
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	rows, err := database.Conn.Query(ctx,
 		`SELECT 
 			t.id AS id,
 			t.valor AS valor,
@@ -111,7 +121,7 @@ func (r *TransactionsRepository) FindAll(idConta string) ([]*entity.TransactionE
 		idConta, idConta,
 	)
 	if err != nil {
-		log.Printf("Erro ao buscar todas as transações: %v", err)
+		// log.Printf("Erro ao buscar todas as transações: %v", err)
 		return nil, err
 	}
 	defer rows.Close()

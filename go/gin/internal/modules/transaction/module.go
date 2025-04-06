@@ -1,24 +1,17 @@
 package transaction
 
 import (
-	"database/sql"
 	"tcc/internal/modules/account"
 	auth "tcc/internal/modules/auth/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-func TransactionModule(router *gin.Engine, db *sql.DB) {
-	accountRepository := account.NewAccountRepository(db)
-	transactionRepository := TransactionsRepository{
-		db: db,
-	}
-
-
+func TransactionModule(router *gin.Engine) {
 	service := TransactionService{
 		repository: struct{account account.AccountRepository; transaction TransactionsRepository}{
-			account: accountRepository,
-			transaction: transactionRepository,
+			account: account.AccountRepository{},
+			transaction: TransactionsRepository{},
 		},
 	}
 	controller := TransactionController{

@@ -1,22 +1,17 @@
 package admin
 
 import (
-	"database/sql"
 	"tcc/internal/modules/client"
 	"tcc/internal/modules/manager"
 
 	"github.com/gin-gonic/gin"
 )
 
-func AdminModule(router *gin.Engine, db *sql.DB) {
-	clientRepository := client.NewClientRepository(db)
-	managerRepository := manager.NewManagerRepository(db)
-
-
+func AdminModule(router *gin.Engine) {
 	service := AdminService{
 		repository: struct{client client.ClientRepository; manager manager.ManagerRepository}{
-			client: clientRepository,
-			manager: managerRepository,
+			client: client.ClientRepository{},
+			manager: manager.ManagerRepository{},
 		},
 	} 
 	controller := AdminController{

@@ -1,21 +1,16 @@
 package account
 
 import (
+	"context"
 	"database/sql"
-	"log" // Adicionado para logging
+	"log"
+	"tcc/internal/database"
 	"tcc/internal/modules/account/entity"
 	"time"
+
+	"github.com/jackc/pgx/v5"
 )
 
-
-type Agencia struct {
-	ID               string    `json:"id"`
-	Nome             string    `json:"nome"`
-	Numero           string    `json:"numero"`
-	Telefone         string    `json:"telefone"`
-	DataDeCriacao    time.Time `json:"dataDeCriacao"`
-	DataDeAtualizacao time.Time `json:"dataDeAtualizacao"`
-}
 
 type ICreateAccountData struct {
 	Tipo      string
@@ -37,26 +32,57 @@ type IAccountRepository interface {
 }
 
 type AccountRepository struct{
-	db *sql.DB
 }
 
 func (r *AccountRepository) Create(data ICreateAccountData) (*entity.AccountEntity, error) {
 	var account entity.AccountEntity
-	err := r.db.QueryRow(
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	// Iniciar a transação
+	tx, err := database.Conn.Begin(ctx)
+	if err != nil {
+		log.Printf("erro ao iniciar transação: %v", err)
+		return nil, err
+	}
+
+	// Em caso de erro, faz rollback
+	defer func() {
+		if err != nil {
+			log.Println("Rollback da transação")
+			tx.Rollback(ctx)
+		}
+	}()
+
+	row := tx.QueryRow(ctx,
 		`INSERT INTO "Conta" (tipo, "idAgencia", "idCliente") VALUES ($1, $2, $3) RETURNING *`,
 		data.Tipo, data.IDAgencia, data.IDCliente,
-	).Scan(&account.ID, &account.Numero, &account.Saldo, &account.Tipo, &account.IDAgencia, &account.IDCliente, &account.DataDeCriacao, &account.DataDeAtualizacao)
+	)
+
+	err = row.Scan(&account.ID, &account.Numero, &account.Saldo, &account.Tipo, &account.IDAgencia, &account.IDCliente, &account.DataDeCriacao, &account.DataDeAtualizacao)
 	if err != nil {
 		log.Printf("Erro ao criar conta: %v", err)
 		return nil, err
 	}
+
+	err = tx.Commit(ctx)
+
+	if err != nil {
+		log.Printf("erro ao commitar transação: %v", err)
+		return nil, err
+	}
+	
 	return &account, nil
 }
 
 func (r *AccountRepository) FindAll(query IQueryFindAllAccounts) ([]*entity.AccountEntity, error) {
 	var agencia sql.NullString
 	var cliente sql.NullString
-	rows, err := r.db.Query(
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	rows, err := database.Conn.Query(ctx,
 		`SELECT 
         c.id AS id,
         c.numero AS numero,
@@ -156,13 +182,17 @@ func (r *AccountRepository) FindById(id string, join bool) (*entity.AccountEntit
 	var cliente sql.NullString
 	var agencia sql.NullString
 	var err error
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
 	if join {
-		err = r.db.QueryRow(query, id).Scan(&account.ID, &account.Numero, &account.Saldo, &account.Tipo, &account.IDAgencia, &account.IDCliente, &account.DataDeCriacao, &account.DataDeAtualizacao, &cliente, &agencia)
+		err = database.Conn.QueryRow(ctx,query, id).Scan(&account.ID, &account.Numero, &account.Saldo, &account.Tipo, &account.IDAgencia, &account.IDCliente, &account.DataDeCriacao, &account.DataDeAtualizacao, &cliente, &agencia)
 	} else {
-		err = r.db.QueryRow(query, id).Scan(&account.ID, &account.Numero, &account.Saldo, &account.Tipo, &account.IDAgencia, &account.IDCliente, &account.DataDeCriacao, &account.DataDeAtualizacao)
+		err = database.Conn.QueryRow(ctx,query, id).Scan(&account.ID, &account.Numero, &account.Saldo, &account.Tipo, &account.IDAgencia, &account.IDCliente, &account.DataDeCriacao, &account.DataDeAtualizacao)
 	}
 	if err != nil {
-		log.Printf("Erro ao buscar conta por ID: %v", err)
+		// log.Printf("Erro ao buscar conta por ID: %v", err)
 		return nil, err
 	}
 
@@ -177,8 +207,11 @@ func (r *AccountRepository) FindById(id string, join bool) (*entity.AccountEntit
 	return &account, nil
 }
 
-func (r *AccountRepository) AddBalance(tx *sql.Tx,id string, value float64) error {
-	_, err := r.db.Exec(
+func (r *AccountRepository) AddBalance(id string, value float64, tx pgx.Tx) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	_, err := tx.Exec(ctx,
 		`UPDATE "Conta"
       SET saldo = saldo + $1
       WHERE id = $2`,
@@ -187,11 +220,13 @@ func (r *AccountRepository) AddBalance(tx *sql.Tx,id string, value float64) erro
 	if err != nil {
 		log.Printf("Erro ao adicionar saldo: %v", err)
 	}
-	return err
 }
 
-func (r *AccountRepository) RemoveBalance(tx *sql.Tx, id string, value float64) error {
-	_, err := r.db.Exec(
+func (r *AccountRepository) RemoveBalance(id string, value float64, tx pgx.Tx) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	_, err := tx.Exec(ctx,
 		`UPDATE "Conta"
       SET saldo = saldo - $1
       WHERE id = $2`,
@@ -200,11 +235,13 @@ func (r *AccountRepository) RemoveBalance(tx *sql.Tx, id string, value float64) 
 	if err != nil {
 		log.Printf("Erro ao remover saldo: %v", err)
 	}
-	return err
 }
 
 func (r *AccountRepository) Delete(id string) error {
-	_, err := r.db.Exec(
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	_, err := database.Conn.Exec(ctx,
 		`DELETE FROM "Conta"
       WHERE id = $1`,
 		id,
@@ -213,11 +250,4 @@ func (r *AccountRepository) Delete(id string) error {
 		log.Printf("Erro ao deletar conta: %v", err)
 	}
 	return err
-}
-
-
-func NewAccountRepository (db *sql.DB) AccountRepository{
-	return AccountRepository{
-		db: db,
-	}
 }

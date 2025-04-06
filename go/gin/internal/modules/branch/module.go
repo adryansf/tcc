@@ -1,18 +1,14 @@
 package branch
 
 import (
-	"database/sql"
 	auth "tcc/internal/modules/auth/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-func BranchModule(router *gin.Engine, db *sql.DB) {
-	repository := BranchRepository{
-		db: db,
-	}
+func BranchModule(router *gin.Engine) {
 	service := BranchService{
-		repository: repository,
+		repository: BranchRepository{},
 	}
 	controller := BranchController{
 		service: service,

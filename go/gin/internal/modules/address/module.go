@@ -1,22 +1,17 @@
 package address
 
 import (
-	"database/sql"
 	auth "tcc/internal/modules/auth/middleware"
 	"tcc/internal/modules/client"
 
 	"github.com/gin-gonic/gin"
 )
 
-func AddressModule(router *gin.Engine, db *sql.DB) {
-	clientRepository := client.NewClientRepository(db)
-	addressRepository := AddressRepository{
-		db: db,
-	}
+func AddressModule(router *gin.Engine) {
 	service := AddressService{
 		repository: struct{client client.ClientRepository; address AddressRepository}{
-			client: clientRepository,
-			address: addressRepository,
+			client: client.ClientRepository{},
+			address: AddressRepository{},
 		},
 	}
 	controller := AddressController{

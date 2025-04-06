@@ -1,7 +1,6 @@
 package client
 
 import (
-	"database/sql"
 	"tcc/internal/common/enum"
 	"tcc/internal/common/middleware"
 	auth "tcc/internal/modules/auth/middleware"
@@ -9,12 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ClientModule(router *gin.Engine, db *sql.DB) {
-	repository := ClientRepository{
-		db: db,
-	}
+func ClientModule(router *gin.Engine) {
 	service := ClientService{
-		repository: repository,
+		repository: ClientRepository{},
 	}
 	controller := ClientController{
 		service: service,

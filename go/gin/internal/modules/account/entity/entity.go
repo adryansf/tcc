@@ -6,6 +6,8 @@ import (
 	branch "tcc/internal/modules/branch/entity"
 	client "tcc/internal/modules/client/entity"
 
+	"tcc/internal/types"
+
 	"github.com/google/uuid"
 )
 
@@ -16,8 +18,8 @@ type AccountEntity struct {
 	Tipo            enum.AccountTypeEnum `json:"tipo"`
 	IDAgencia       *uuid.UUID        `json:"idAgencia,omitempty"`
 	IDCliente       *uuid.UUID        `json:"idCliente,omitempty"`
-	DataDeCriacao   string     `json:"dataDeCriacao"`
-	DataDeAtualizacao string   `json:"dataDeAtualizacao"`
+	DataDeCriacao   types.CustomTime     `json:"dataDeCriacao"`
+	DataDeAtualizacao types.CustomTime   `json:"dataDeAtualizacao"`
 	Cliente         *client.ClientEntity `json:"cliente,omitempty"`
 	Agencia         *branch.BranchEntity `json:"agencia,omitempty"`
 }

@@ -1,6 +1,8 @@
 package transaction
 
 import (
+	"context"
+	"log"
 	r "tcc/internal/common/enum"
 	"tcc/internal/common/errors"
 	"tcc/internal/common/helper"
@@ -11,6 +13,7 @@ import (
 	"tcc/internal/modules/transaction/dto"
 	"tcc/internal/modules/transaction/entity"
 	"tcc/internal/modules/transaction/enum"
+	"time"
 )
 
 type TransactionService struct{
@@ -58,40 +61,44 @@ func (s *TransactionService) Create(data dto.CreateTransactionDto, idClient stri
 
 
 	// Iniciar transação
-	tx, err := database.StartTransaction(s.repository.transaction.db)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	tx, err := database.Conn.Begin(ctx)
+
 	if err != nil {
 		return nil, errors.InternalServerError(messages.ErrorMessages.InternalServer)
 	}
 
-	newTransaction, err := s.repository.transaction.Create(tx, ICreateTransactionData{
+	defer func() {
+		if err != nil {
+			log.Println("Rollback da transação")
+			tx.Rollback(ctx)
+		}
+	}()
+
+	switch tipo {
+		case enum.DEPOSIT:
+			s.repository.account.AddBalance(*data.IDContaDestino, data.Valor, tx)
+		case enum.TRANSFER:
+			s.repository.account.RemoveBalance(*data.IDContaOrigem, data.Valor, tx)
+			s.repository.account.AddBalance(*data.IDContaDestino, data.Valor, tx)
+		case enum.WITHDRAWAL:
+			s.repository.account.RemoveBalance(*data.IDContaOrigem, data.Valor, tx)
+	}
+
+	newTransaction, err := s.repository.transaction.Create(ICreateTransactionData{
 		Tipo: tipo,
 		Valor: data.Valor,
 		IDContaOrigem: data.IDContaOrigem,
 		IDContaDestino: data.IDContaDestino,
-	})
-
+	}, tx)
 	if err != nil {
-		database.EndTransaction(tx, err)
+		tx.Rollback(ctx)
 		return nil, errors.InternalServerError(messages.ErrorMessages.InternalServer)
 	}
 
-	switch tipo {
-	case enum.DEPOSIT:
-		err = s.repository.account.AddBalance(tx, *data.IDContaDestino, data.Valor)
-	case enum.TRANSFER:
-		err = s.repository.account.RemoveBalance(tx, *data.IDContaOrigem, data.Valor)
-		if err == nil {
-			err = s.repository.account.AddBalance(tx, *data.IDContaDestino, data.Valor)
-		}
-	case enum.WITHDRAWAL:
-		err = s.repository.account.RemoveBalance(tx, *data.IDContaOrigem, data.Valor)
-	}
-
-
-
-	success := database.EndTransaction(tx, err)
-
-	if !success{
+	err = tx.Commit(ctx)
+	if err != nil {
 		return nil, errors.InternalServerError(messages.ErrorMessages.InternalServer)
 	}
 
