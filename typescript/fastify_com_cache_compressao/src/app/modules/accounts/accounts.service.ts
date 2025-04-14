@@ -23,7 +23,9 @@ import { RoleEnum } from "@/common/enums/role.enum";
 import { CacheService } from "@/app/common/cache/cache.service";
 import { JwtPayload } from "jsonwebtoken";
 import { InternalServerError } from "@/app/common/errors/internal-server.error";
-
+import { ManagerEntity } from "../managers/entities/manager.entity";
+import { BranchEntity } from "../branchs/entities/branch.entity";
+import { ClientEntity } from "../clients/entities/client.entity";
 interface IAccountsService {
   findAll: (
     query: FindAllQueryAccountDto,
@@ -74,7 +76,17 @@ export class AccountsService implements IAccountsService {
     { role, email, cpf }: JwtPayload
   ): Promise<Either<BaseError, AccountEntity>> {
     if (role === RoleEnum.MANAGER) {
-      const manager = await this._repositories.managers.findByEmail(email);
+      const cacheKey = `manager:email:${email}`;
+
+      let manager = await this._cacheService.get<Partial<ManagerEntity>>(
+        cacheKey
+      );
+
+      if (!manager) {
+        manager = await this._repositories.managers.findByEmail(email);
+        await this._cacheService.set(cacheKey, manager);
+      }
+
       data.idAgencia = manager.idAgencia;
     }
 
@@ -84,8 +96,20 @@ export class AccountsService implements IAccountsService {
       );
     }
 
-    const branch = await this._repositories.branchs.findById(data.idAgencia);
+    // Cache Branch
+    const cacheKeyBranch = `branch:id:${data.idAgencia}`;
 
+    let branch = await this._cacheService.get<Partial<BranchEntity>>(
+      cacheKeyBranch
+    );
+
+    // Buscar no banco e Colocar em cache se não estiver
+    if (!branch) {
+      branch = await this._repositories.branchs.findById(data.idAgencia);
+      await this._cacheService.set(cacheKeyBranch, branch);
+    }
+
+    // Verificar se a branch existe
     if (!branch) {
       return left(
         new BadRequestError(MESSAGES.error.account.BadRequest.BranchNotExists)
@@ -99,8 +123,20 @@ export class AccountsService implements IAccountsService {
         );
       }
 
-      var client = await this._repositories.clients.findById(data.idCliente);
+      // Buscar Cliente no cache
+      const cacheKeyClient = `client:id:${data.idCliente}`;
 
+      var client = await this._cacheService.get<Partial<ClientEntity>>(
+        cacheKeyClient
+      );
+
+      // Buscar no banco e Colocar em cache se não estiver
+      if (!client) {
+        client = await this._repositories.clients.findById(data.idCliente);
+        await this._cacheService.set(cacheKeyClient, client);
+      }
+
+      // Verificar se o cliente existe
       if (!client) {
         return left(new BadRequestError(MESSAGES.error.client.NotFound));
       }
@@ -120,6 +156,7 @@ export class AccountsService implements IAccountsService {
     }
 
     await this._cacheService.reset(`accounts:all:${cpf}`);
+    await this._cacheService.set(`account:id:${newAccount.id}`, newAccount);
 
     return right(newAccount);
   }
@@ -131,8 +168,20 @@ export class AccountsService implements IAccountsService {
   ): Promise<Either<BaseError, AccountEntity>> {
     const permission = hasPermission(role, RoleEnum.MANAGER);
 
-    const account = await this._repositories.accounts.findById(id, true);
+    const cacheKey = `account:id:${id}`;
 
+    // Buscar no cache
+    let account = await this._cacheService.get<AccountEntity>(
+      cacheKey
+    ); 
+
+    // Buscar no banco e Colocar em cache se não estiver
+    if (!account) {
+      account = await this._repositories.accounts.findById(id);
+      await this._cacheService.set(cacheKey, account);
+    }
+
+    // Verificar se a conta existe
     if (!account) {
       return left(new NotFoundError(MESSAGES.error.account.NotFound));
     }

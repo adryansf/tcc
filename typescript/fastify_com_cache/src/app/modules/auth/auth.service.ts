@@ -18,6 +18,9 @@ import { MESSAGES } from "@/app/common/messages";
 // Types
 import { Repositories } from "./auth.module";
 import { RoleEnum } from "@/common/enums/role.enum";
+import { CacheService } from "@/app/common/cache/cache.service";
+import { ClientEntity } from "../clients/entities/client.entity";
+import { ManagerEntity } from "../managers/entities/manager.entity";
 
 interface IAuthService {
   loginClients: (
@@ -29,12 +32,22 @@ interface IAuthService {
 }
 
 export class AuthService implements IAuthService {
-  constructor(private _repositories: Repositories) {}
+  constructor(private _repositories: Repositories, private _cacheService: CacheService) {}
 
   async loginClients(
     data: LoginAuthDto
   ): Promise<Either<BaseError, Omit<LoginAuthClientsOutputDto, "toJSON">>> {
-    const client = await this._repositories.clients.findByEmail(data.email);
+    const cacheKey = `client:email:${data.email}`;
+
+    let client = await this._cacheService.get<Partial<ClientEntity>>(
+      cacheKey
+    );
+
+    // Se não estiver no cache, buscar no banco de dados
+    if (!client) 
+      client = await this._repositories.clients.findByEmail(data.email);
+    
+
     if (!client) {
       return left(new BadRequestError(MESSAGES.error.auth.BadRequest));
     }
@@ -42,6 +55,9 @@ export class AuthService implements IAuthService {
     if (!isPasswordCorrect(data.senha, client.senha)) {
       return left(new BadRequestError(MESSAGES.error.auth.BadRequest));
     }
+
+    // Colocar no cache
+    await this._cacheService.set(cacheKey, client);
 
     delete client["senha"];
 
@@ -63,7 +79,16 @@ export class AuthService implements IAuthService {
   async loginManagers(
     data: LoginAuthDto
   ): Promise<Either<BaseError, Omit<LoginAuthManagersOutputDto, "toJSON">>> {
-    const manager = await this._repositories.managers.findByEmail(data.email);
+    const cacheKey = `manager:email:${data.email}`;
+
+    let manager = await this._cacheService.get<Partial<ManagerEntity>>(
+      cacheKey
+    );
+
+    if (!manager) {
+      manager = await this._repositories.managers.findByEmail(data.email);
+    }
+
     if (!manager) {
       return left(new BadRequestError(MESSAGES.error.auth.BadRequest));
     }
@@ -71,6 +96,9 @@ export class AuthService implements IAuthService {
     if (!isPasswordCorrect(data.senha, manager.senha)) {
       return left(new BadRequestError(MESSAGES.error.auth.BadRequest));
     }
+
+    // Colocar no cache
+    await this._cacheService.set(cacheKey, manager);
 
     delete manager["senha"];
 

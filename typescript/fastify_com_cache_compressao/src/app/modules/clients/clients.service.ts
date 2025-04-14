@@ -56,6 +56,8 @@ export class ClientsService implements IClientsService {
     }
 
     await this._cacheService.set(cacheKey, client);
+    await this._cacheService.set(`client:id:${client.id}`, client);
+    await this._cacheService.set(`client:email:${client.email}`, client);
 
     return right(client);
   }
@@ -78,6 +80,8 @@ export class ClientsService implements IClientsService {
     }
 
     await this._cacheService.set(cacheKey, client);
+    await this._cacheService.set(`client:cpf:${client.cpf}`, client);
+    await this._cacheService.set(`client:email:${client.email}`, client);
 
     return right(client);
   }
@@ -85,6 +89,9 @@ export class ClientsService implements IClientsService {
   async create(
     data: CreateClientDto
   ): Promise<Either<BaseError, Partial<ClientEntity>>> {
+    const cacheKeyCPF = `client:cpf:${data.cpf}`;
+    const cacheKeyEmail = `client:email:${data.email}`;
+
     const existsEmail = await this._repository.findByEmail(data.email);
 
     if (existsEmail) {
@@ -104,11 +111,15 @@ export class ClientsService implements IClientsService {
     const senha = await encryptPassword(data.senha);
 
     const client = await this._repository.create({ ...data, senha });
+    
 
     if (client === null) {
       return left(new InternalServerError(MESSAGES.error.InternalServer));
     }
 
+    await this._cacheService.set(cacheKeyEmail, client);
+    await this._cacheService.set(cacheKeyCPF, client);
+    await this._cacheService.set(`client:id:${client.id}`, client);
     return right(client);
   }
 }

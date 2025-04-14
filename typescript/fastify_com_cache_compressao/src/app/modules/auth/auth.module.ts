@@ -3,6 +3,7 @@ import { AuthService } from "./auth.service";
 import { AuthController } from "./auth.controller";
 import { ClientsRepository } from "../clients/clients.repository";
 import { ManagersRepository } from "../managers/managers.repository";
+import { CacheService } from "@/app/common/cache/cache.service";
 
 // Types
 export interface Repositories {
@@ -16,11 +17,13 @@ export class AuthModule extends BaseModuleMultipleRepositories<
   Repositories
 > {
   constructor() {
+    const cacheService = new CacheService();
+
     const _repositories = {
       clients: new ClientsRepository(),
       managers: new ManagersRepository(),
     };
-    const _service = new AuthService(_repositories);
+    const _service = new AuthService(_repositories, cacheService);
     const _controller = new AuthController(_service);
 
     super("auth", _controller, _service);

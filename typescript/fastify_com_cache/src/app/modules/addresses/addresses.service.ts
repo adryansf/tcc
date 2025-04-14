@@ -62,6 +62,7 @@ export class AddressesService implements IAddressesService {
 
     await this._cacheService.reset(`client:id:${client.id}`);
     await this._cacheService.reset(`client:cpf:${client.cpf}`);
+    await this._cacheService.reset(`client:email:${client.email}`);
 
     return right(newAddress);
   }
