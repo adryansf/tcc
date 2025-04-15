@@ -1,0 +1,3 @@
+mod roles_permitted_middleware;
+
+pub use roles_permitted_middleware::roles_permitted_middleware;
