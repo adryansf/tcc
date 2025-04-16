@@ -2,8 +2,7 @@ use axum::{
     extract::Path,
     http::StatusCode,
     response::IntoResponse,
-    Json,
-    Extension
+    Json
 };
 use validator::Validate;
 use crate::common::errors::bad_request::bad_request_error;

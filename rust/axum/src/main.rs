@@ -1,4 +1,5 @@
 use axum::Router;
+#[cfg(debug_assertions)]
 use dotenvy;
 
 mod database;
@@ -7,12 +8,14 @@ mod common;
 
 #[tokio::main]
 async fn main(){
-    dotenvy::dotenv().expect("Failed to read .env file");
+    #[cfg(debug_assertions)]
+    {
+        dotenvy::dotenv().expect("Failed to read .env file");
+    }
 
-    let port: String = std::env::var("SERVER_PORT").expect("SERVER_PORT not set in .env file");
+    let port: String = std::env::var("SERVER_PORT").expect("SERVER_PORT not set in environment variables");
 
     database::connect().await;
-
 
     let app = Router::new()
                                 .merge(modules::client::module::client_module())

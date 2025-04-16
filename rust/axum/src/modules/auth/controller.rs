@@ -1,5 +1,4 @@
-use axum::{Json, http::StatusCode};
-use serde::{Deserialize, Serialize};
+use axum::Json;
 use crate::common::errors::base::BaseError;
 use crate::common::errors::bad_request::bad_request_error;
 use crate::common::messages::error::ErrorMessages;
