@@ -1,0 +1,24 @@
+name: tcc
+
+services:
+  app:
+    build: .
+    ports:
+      - "3333:3333"
+    environment:
+      ENV: production
+      DB_HOST: tcc_database
+      DB_PORT: 5432
+      DB_USER: tcc_user
+      DB_PASSWORD: tcc_password
+      DB_NAME: tcc_db
+      SERVER_PORT: 3333
+      JWT_SECRET: dcbacadf485c141a2b9b0028f2c0b2e1
+      JWT_EXPIRES_IN: 86400
+      REDIS_URL: redis://redis_tcc:6379
+    networks:
+      - tcc_network
+
+networks:
+  tcc_network:
+    driver: bridge

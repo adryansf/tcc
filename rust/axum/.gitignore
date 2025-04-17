@@ -1,0 +1,33 @@
+# Arquivos de build
+target/
+**/*.rs.bk
+
+# Artefatos temporários de compilação
+*.rlib
+*.rmeta
+
+# Arquivos gerados pelo Cargo
+/Cargo.lock
+
+# Se for um projeto de biblioteca, você pode querer manter o Cargo.lock
+# (para binários, geralmente é ignorado)
+
+# Diretórios ocultos e arquivos temporários
+**/*.swp
+**/*.swo
+**/*.tmp
+**/*~
+
+# IDEs e editores
+.idea/
+.vscode/
+*.code-workspace
+
+# Logs, dumps, etc.
+*.log
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+.env
