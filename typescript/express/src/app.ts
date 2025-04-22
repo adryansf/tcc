@@ -2,6 +2,9 @@ import "reflect-metadata";
 import cors from "cors";
 import express from "express";
 
+// Erros
+import { InternalServerError } from "./app/common/errors/internal-server.error";
+
 // Server
 import { Server } from "./server";
 
@@ -27,7 +30,21 @@ export class App implements IApp {
     this._server.use(express.json());
   }
 
-  postMiddlewares() {}
+  postMiddlewares() {
+    this._server.use(
+      (
+        err: Error,
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction
+      ) => {
+        console.error(err.stack);
+        const error = new InternalServerError();
+
+        res.status(error.statusCode).json(error.toJSON());
+      }
+    );
+  }
 
   loadModules() {
     for (const module of modules) {
