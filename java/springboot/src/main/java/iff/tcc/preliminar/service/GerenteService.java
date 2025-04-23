@@ -11,6 +11,7 @@ import iff.tcc.preliminar.repository.GerenteRepository;
 import iff.tcc.preliminar.utils.RegistroUtil;
 import iff.tcc.preliminar.utils.TokenUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -67,6 +68,10 @@ public class GerenteService {
     public void delete(UUID id) {
         Gerente gerente = findById(id);
         gerenteRepository.delete(gerente);
+    }
+
+    public List<Gerente> getGerenteQuantidade(int quantidade) {
+        return gerenteRepository.findAll(Pageable.ofSize(quantidade)).getContent();
     }
 
     private Agencia getAgencia(UUID agenciaId) {

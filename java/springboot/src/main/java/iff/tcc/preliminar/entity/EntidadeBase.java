@@ -1,10 +1,6 @@
 package iff.tcc.preliminar.entity;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,10 +9,10 @@ import java.util.UUID;
 @Data
 public class EntidadeBase {
     @Id
-    @UuidGenerator
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Column(insertable = false)
+    @Column(name = "\"dataDeCriacao\"", insertable = false)
     private LocalDateTime dataDeCriacao;
-    @Column(insertable = false)
+    @Column(name = "\"dataDeAtualizacao\"", insertable = false)
     private LocalDateTime dataDeAtualizacao;
 }

@@ -12,6 +12,7 @@ import iff.tcc.preliminar.repository.EnderecoRepository;
 import iff.tcc.preliminar.utils.RegistroUtil;
 import iff.tcc.preliminar.utils.TokenUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -83,6 +84,10 @@ public class ClienteService {
     public void delete(UUID id) {
         Cliente cliente = findById(id);
         clienteRepository.delete(cliente);
+    }
+
+    public List<Cliente> getClientesQuantidade(int quantidade) {
+        return clienteRepository.findAll(Pageable.ofSize(quantidade)).getContent();
     }
 
     public ClienteComEnderecoDTO formatarRetorno(Cliente cliente, Optional<Endereco> endereco) {

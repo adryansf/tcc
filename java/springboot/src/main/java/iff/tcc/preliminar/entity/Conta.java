@@ -5,18 +5,20 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
-@Table(name = "Conta")
+@Table(name = "\"Conta\"")
 @Data
 public class Conta extends EntidadeBase {
-    @Column(insertable = false)
+    @Column(name = "\"numero\"", nullable = false, insertable = false)
     private Integer numero;
+    @Column(name = "\"saldo\"", nullable = false)
     private long saldo;
     @Enumerated(EnumType.STRING)
+    @Column(name = "\"tipo\"", nullable = false)
     private TipoDeConta tipo;
     @ManyToOne
-    @JoinColumn(name = "idAgencia")
+    @JoinColumn(name = "\"idAgencia\"", nullable = false)
     private Agencia agencia;
     @ManyToOne
-    @JoinColumn(name = "idCliente")
+    @JoinColumn(name = "\"idCliente\"", nullable = false)
     private Cliente cliente;
 }

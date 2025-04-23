@@ -21,6 +21,8 @@ public class SecurityConfig {
         return http.authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/clientes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/admin/clientes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/admin/gerentes").permitAll()
                         .anyRequest().authenticated()
                 ).csrf(csrf -> csrf
                         .ignoringRequestMatchers("/**"))

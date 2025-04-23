@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "Endereco")
+@Table(name = "\"Endereco\"")
 @Data
 public class Endereco extends EntidadeBase {
     private String logradouro;
@@ -17,7 +17,7 @@ public class Endereco extends EntidadeBase {
     private String cidade;
     private String uf;
     private String cep;
-    @JoinColumn(name = "idCliente")
+    @JoinColumn(name = "\"idCliente\"")
     @OneToOne
     private Cliente cliente;
 }
