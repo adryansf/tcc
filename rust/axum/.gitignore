@@ -7,7 +7,7 @@ target/
 *.rmeta
 
 # Arquivos gerados pelo Cargo
-/Cargo.lock
+Cargo.lock
 
 # Se for um projeto de biblioteca, você pode querer manter o Cargo.lock
 # (para binários, geralmente é ignorado)

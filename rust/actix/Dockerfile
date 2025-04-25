@@ -10,7 +10,7 @@ RUN apt-get update && \
     apt-get install -y pkg-config libssl-dev && \
     rm -rf /var/lib/apt/lists/*
 
-COPY Cargo.lock Cargo.toml ./
+COPY Cargo.toml ./
 RUN mkdir src \
     && echo "// dummy file" > src/lib.rs \
     && cargo build --release

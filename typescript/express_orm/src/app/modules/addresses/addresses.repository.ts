@@ -1,6 +1,3 @@
-// Database
-import { sequelize } from "@/database";
-
 // Entities
 import { AddressEntity } from "./entities/address.entity";
 
