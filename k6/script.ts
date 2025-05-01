@@ -13,7 +13,7 @@ import { randomItem } from "https://jslib.k6.io/k6-utils/1.6.0/index.js";
 import ManagerCreatingAccount from "./scenarios/Manager-Creating-Account.ts";
 import ManagerVerifyingTransfers from "./scenarios/Manager-Verifying-Transfers.ts";
 
-const TEST_SCENARIO = "load";
+const TEST_SCENARIO = "spike";
 
 const scenarios = {
   load: {
@@ -33,31 +33,38 @@ const scenarios = {
   },
   stress: {
     executor: "ramping-vus",
-    startVUs: 1000,
+    startVUs: 100,
     stages: [
-      { duration: "1m", target: 1500 }, // Sobe para 1500 usuários
-      { duration: "1m", target: 2000 }, // Sobe para 2000 usuários
-      { duration: "1m", target: 2500 }, // Continua subindo até 5000
-      { duration: "1m", target: 3000 },
-      { duration: "1m", target: 3500 },
-      { duration: "1m", target: 4000 },
-      { duration: "1m", target: 4500 },
-      { duration: "13m", target: 5000 }, // Mantém 5000 usuários até o fim
+      { duration: "60s", target: 100 }, 
+      { duration: "0s", target: 200 },
+      { duration: "60s", target: 200 }, 
+      { duration: "0s", target: 300 },
+      { duration: "60s", target: 300 }, 
+      { duration: "0s", target: 400 },
+      { duration: "60s", target: 400 }, 
+      { duration: "0s", target: 500 },
+      { duration: "60s", target: 500 }, 
+      { duration: "0s", target: 600 },
+      { duration: "60s", target: 600 }, 
+      { duration: "0s", target: 700 },
+      { duration: "60s", target: 700 }, 
+      { duration: "0s", target: 800 },
+      { duration: "60s", target: 800 }, 
+      { duration: "0s", target: 900 },
+      { duration: "60s", target: 900 }, 
+      { duration: "0s", target: 1000 },
+      { duration: "60s", target: 1000 }, 
     ],
   },
   spike: {
     executor: "ramping-vus",
+    startVUs: 50,
     stages: [
-      { duration: "10s", target: 50 }, // Sobe de 50 para 3000 usuários em 10s
-      { duration: "5m", target: 3000 }, // Mantém 3000 usuários ativos por 5 minutos
-      { duration: "5m", target: 50 }, // Reduz gradualmente para 50 usuários
+      { duration: "60s", target: 50 },
+      { duration: "10s", target: 1500 },
+      { duration: "5m", target: 50 }, 
     ],
-  },
-  soak: {
-    executor: "constant-vus",
-    vus: 10,
-    duration: "15m",
-  },
+  }
 };
 
 export let options = {
