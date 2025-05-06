@@ -1,7 +1,9 @@
 from flask import Flask
 from flask import Blueprint
 from flask_cors import CORS
-from waitress import serve
+from gunicorn.app.base import BaseApplication
+from gevent import monkey, pywsgi
+monkey.patch_all()
 
 
 class Server:
@@ -21,7 +23,7 @@ class Server:
     def start(self):
         if self._env == "PRODUCTION":
             print(f"Servidor Rodando na porta {self._port}")
-            serve(self._server, host='0.0.0.0', port=self._port, connection_limit=10000)
+            pywsgi.WSGIServer(("0.0.0.0", self._port), self._server).serve_forever()
         else:
             self._server.run(port=self._port, debug=self._debug)
 
@@ -35,3 +37,17 @@ class Server:
 
     def register_route(self, blueprint: Blueprint):
         return self._server.register_blueprint(blueprint)
+
+
+class GunicornApp(BaseApplication):
+    def __init__(self, app, options=None):
+        self.options = options or {}
+        self.application = app
+        super().__init__()
+
+    def load_config(self):
+        for key, value in self.options.items():
+            self.cfg.set(key, value)
+
+    def load(self):
+        return self.application
