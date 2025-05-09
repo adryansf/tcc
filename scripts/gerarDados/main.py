@@ -9,7 +9,7 @@ from validate_docbr import CPF  # Biblioteca para gerar CPFs válidos
 fake = Faker("pt_BR")
 
 # Configurações
-NUM_CLIENTES = 50000
+NUM_CLIENTES = 125000
 NUM_CONTAS = NUM_CLIENTES  # Uma conta por cliente
 NUM_GERENTES = 100
 SENHA_PADRAO = "SenhaForte123"
@@ -98,7 +98,7 @@ def gerar_contas(clientes):
 
         contas.append([
             str(uuid.uuid4()), num_conta, 1000.00,  # Saldo inicial de R$1000
-            random.choice(["CORRENTE", "POUPANÇA"]), AGENCIA_ID, cliente[0],
+            random.choice(["CORRENTE", "POUPANCA"]), AGENCIA_ID, cliente[0],
             datetime.now().isoformat(), datetime.now().isoformat()
         ])
     return contas
@@ -108,7 +108,7 @@ def gerar_transacoes(contas):
     transacoes = []
     for conta in contas:
         transacoes.append([
-            str(uuid.uuid4()), 1000.00, "DEPÓSITO", None, conta[0], datetime.now().isoformat()
+            str(uuid.uuid4()), 1000.00, "DEPOSITO", None, conta[0], datetime.now().isoformat()
         ])
     return transacoes
 
@@ -130,12 +130,12 @@ transacoes = gerar_transacoes(contas)
 agencia = [[AGENCIA_ID, AGENCIA_NOME, AGENCIA_TELEFONE, AGENCIA_NUMERO, AGENCIA_CRIACAO, AGENCIA_CRIACAO]]
 
 # Salvar os arquivos CSV
-salvar_csv("agencias.csv", agencia, ["id", "nome", "telefone", "numero", "dataDeCriacao", "dataDeAtualizacao"])
-salvar_csv("clientes.csv", clientes, ["id", "cpf", "email", "nome", "telefone", "dataDeNascimento", "senha", "dataDeCriacao", "dataDeAtualizacao"])
-salvar_csv("enderecos.csv", enderecos, ["id", "logradouro", "numero", "bairro", "cidade", "uf", "cep", "idCliente", "dataDeCriacao", "dataDeAtualizacao"])
-salvar_csv("gerentes.csv", gerentes, ["id", "idAgencia", "cpf", "email", "nome", "telefone", "dataDeNascimento", "senha", "dataDeCriacao", "dataDeAtualizacao"])
-salvar_csv("contas.csv", contas, ["id", "numero", "saldo", "tipo", "idAgencia", "idCliente", "dataDeCriacao", "dataDeAtualizacao"])
-salvar_csv("transacoes.csv", transacoes, ["id", "valor", "tipo", "idContaOrigem", "idContaDestino", "dataDeCriacao"])
+salvar_csv("Agencia.csv", agencia, ["id", "nome", "telefone", "numero", "dataDeCriacao", "dataDeAtualizacao"])
+salvar_csv("Cliente.csv", clientes, ["id", "cpf", "email", "nome", "telefone", "dataDeNascimento", "senha", "dataDeCriacao", "dataDeAtualizacao"])
+salvar_csv("Endereco.csv", enderecos, ["id", "logradouro", "numero", "bairro", "cidade", "uf", "cep", "idCliente", "dataDeCriacao", "dataDeAtualizacao"])
+salvar_csv("Gerente.csv", gerentes, ["id", "idAgencia", "cpf", "email", "nome", "telefone", "dataDeNascimento", "senha", "dataDeCriacao", "dataDeAtualizacao"])
+salvar_csv("Conta.csv", contas, ["id", "numero", "saldo", "tipo", "idAgencia", "idCliente", "dataDeCriacao", "dataDeAtualizacao"])
+salvar_csv("Transacao.csv", transacoes, ["id", "valor", "tipo", "idContaOrigem", "idContaDestino", "dataDeCriacao"])
 
 print("Arquivos CSV gerados com sucesso!")
 

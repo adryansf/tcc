@@ -1,5 +1,5 @@
 package iff.tcc.ajustado.entity.enums;
 
 public enum TipoDeTransacao {
-    DEPOSITO, SAQUE, TRANSFERENCIA
+    DEPÓSITO, SAQUE, TRANSFERENCIA, DEPOSITO
 }

@@ -1,6 +1,5 @@
 package iff.tcc.ajustado.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -13,8 +12,8 @@ public class EntidadeBase {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    @Column(insertable = false)
+    @Column(name = "\"dataDeCriacao\"", insertable = false)
     private LocalDateTime dataDeCriacao;
-    @Column(insertable = false)
+    @Column(name = "\"dataDeAtualizacao\"", insertable = false)
     private LocalDateTime dataDeAtualizacao;
 }

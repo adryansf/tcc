@@ -29,8 +29,8 @@ func Connect() error {
 	}
 
 	// Define min e max conexões
-	config.MinConns = 100
-	config.MaxConns = 100
+	config.MinConns = 20
+	config.MaxConns = 20
 
 	// Cria a pool com a configuração personalizada
 	Conn, err = pgxpool.NewWithConfig(context.Background(), config)

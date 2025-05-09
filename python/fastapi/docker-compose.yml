@@ -19,6 +19,11 @@ services:
       SERVER_PORT: 3333
       JWT_SECRET: dcbacadf485c141a2b9b0028f2c0b2e1
       JWT_EXPIRES_IN: 86400
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: "2048M" 
 
 networks:
   tcc_network:

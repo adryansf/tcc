@@ -13,7 +13,7 @@ import { randomItem } from "https://jslib.k6.io/k6-utils/1.6.0/index.js";
 import ManagerCreatingAccount from "./scenarios/Manager-Creating-Account.ts";
 import ManagerVerifyingTransfers from "./scenarios/Manager-Verifying-Transfers.ts";
 
-const TEST_SCENARIO = "spike";
+const TEST_SCENARIO = "stress";
 
 const scenarios = {
   load: {

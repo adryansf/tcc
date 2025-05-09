@@ -18,6 +18,11 @@ services:
     command: ["npm", "start"]
     networks:
       - tcc_network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: "2048M" 
 
 networks:
   tcc_network:

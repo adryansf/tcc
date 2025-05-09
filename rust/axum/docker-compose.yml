@@ -18,6 +18,11 @@ services:
       REDIS_URL: redis://redis_tcc:6379
     networks:
       - tcc_network
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: "2048M" 
 
 networks:
   tcc_network:

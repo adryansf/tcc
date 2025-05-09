@@ -16,11 +16,6 @@ services:
       JWT_EXPIRES_IN: 86400
       REDIS_URL: redis://redis_tcc:6379
     command: ["npm", "start"]
-    deploy:
-      resources:
-        limits:
-          cpus: "1.5"
-          memory: "2048M" 
     networks:
       - tcc_network
 

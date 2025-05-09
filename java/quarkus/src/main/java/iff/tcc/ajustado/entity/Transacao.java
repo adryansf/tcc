@@ -9,21 +9,23 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "Transacao")
+@Table(name = "\"Transacao\"")
 @Data
 public class Transacao {
     @Id
     @UuidGenerator
     private UUID id;
-    @Column(insertable = false)
+    @Column(name = "\"dataDeCriacao\"", insertable = false)
     private LocalDateTime dataDeCriacao;
+    @Column(name = "\"valor\"", nullable = false)
     private long valor;
     @ManyToOne
-    @JoinColumn(name = "idContaOrigem")
+    @JoinColumn(name = "\"idContaOrigem\"")
     private Conta contaOrigem;
     @ManyToOne
-    @JoinColumn(name = "idContaDestino")
+    @JoinColumn(name = "\"idContaDestino\"")
     private Conta contaDestino;
     @Enumerated(EnumType.STRING)
+    @Column(name = "\"tipo\"", nullable = false)
     private TipoDeTransacao tipo;
 }

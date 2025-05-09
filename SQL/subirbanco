@@ -1,0 +1,34 @@
+#!/bin/bash
+
+cd ..
+
+# Caminho para o arquivo docker-compose
+DOCKER_DB_PATH="dockers/postgres/docker-compose.yml"
+DOCKER_PROMETHEUS_PATH="dockers/prometheusGrafana/docker-compose.yml"
+
+# Subir o banco de dados com Docker Compose
+echo "Subindo o banco de dados com Docker Compose..."
+docker-compose -f "$DOCKER_DB_PATH" up -d
+echo "Banco de dados está pronto!"
+
+# Subir o prometheus com Docker Compose
+echo "Subindo o banco de dados com Docker Compose..."
+docker-compose -f "$DOCKER_PROMETHEUS_PATH" up -d
+echo "Prometheus está pronto!"
+
+sleep 10
+
+# Executar o script SQL para criar as tabelas
+cd SQL
+echo "Executando o script SQL para criar as tabelas..."
+psql postgresql://tcc_user:tcc_password@localhost:5432/tcc_db -f TCC.sql
+echo "Script SQL executado com sucesso!"
+
+cd ..
+cd scripts/gerarDados
+
+# Importar os arquivos CSV para as tabelas
+echo "Importando arquivos CSV para as tabelas..."
+psql postgresql://tcc_user:tcc_password@localhost:5432/tcc_db -f copy.sql
+
+echo "Arquivos CSV importados com sucesso!"
